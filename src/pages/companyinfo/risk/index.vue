@@ -206,6 +206,7 @@ export default {
 	.risk-info-content {
 		height: 100%;
 		padding: 0;
+		padding-bottom: 76px;
 		.risk-info-title {
 			padding: 10px 35px;
 			background: #f8f8f8;

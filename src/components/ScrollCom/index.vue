@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.wrapper(ref="wrapper")
+  .scroll-wrapper(ref="wrapper")
     slot
 </template>
 
@@ -138,6 +138,9 @@ export default {
       // 代理better-scroll的refresh方法
       this.scroll && this.scroll.refresh()
     },
+    destroy () {
+      this.scroll && this.scroll.destroy()
+    },
     scrollTo () {
       // 代理better-scroll的scrollTo方法
       this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
@@ -159,7 +162,7 @@ export default {
 </script>
 
 <style lang="scss">
-.wrapper {
+.scroll-wrapper {
 	width: 100%;
 	height: 100%;
 }

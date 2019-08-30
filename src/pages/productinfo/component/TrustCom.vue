@@ -1,73 +1,72 @@
 <template lang="pug">
-  .trust-com-wrapper
-    .trust-com-filter
-      span 默认排序
-      span 588
-    el-collapse.trust-com-main(accordion)
-      el-collapse-item
-        template(slot="title")
-          i.first.iconfont &#xe690;
-          span 外贸信托-乐瑞强债2号尊享E期集合资金信托计划
-        .collapse-content
-          .title
-            p 发行机构
-            h5 中国对外贸易经济信托有限公司
-          .main
-            p
-              span 产品编码
-              span ZXD44Z2019060100294499
-            p
-              span 首次申请登记日期
-              span 2019-08-08
-            p
-              span 存续期限（月）
-              span 47.5
-            p
-              span 主要投向行业
-              span 金融业
-            p
-              span 财产运用方式
-              span 资产及其收益权（不附回购）
-            p
-              span 公示日期
-              span 2019-08-13
-    product-drawer(:isProductDrawerVisible="isProductDrawerVisible" @close="isProductDrawerVisible=false")
-      .private-placement-com-drawer-slot
+.trust-com-wrapper
+  el-collapse.trust-com-main(accordion)
+    el-collapse-item(v-for="item in list" :key="item.id")
+      template(slot="title")
+        i.first.iconfont &#xe690;
+        div
+          span.title {{item.fullName}}
+          p
+            span {{item.trustFunction | trustFunctionFilter}}
+            span {{item.inverstIndustry | inverstIndustryFilter}}
+            span {{item.propertyRightDesc | propertyRightDescFilter}}
+      .collapse-content
+        .title
+          p 发行机构
+          h5 {{item.trusteeship}}
+        .main
+          p
+            span 产品编码
+            span {{item.productCode }}
+          p
+            span 首次申请登记日期
+            span {{item.firstApplicationRegistion}}
+          p
+            span 存续期限（月）
+            span {{item.recordTime}}
+          p
+            span 主要投向行业
+            span {{item.inverstIndustry}}
+          p
+            span 财产运用方式
+            span {{trustFunction}}
+          p
+            span 公示日期
+            span {{publicityDate}}
+  product-drawer(:isProductDrawerVisible="isProductDrawerVisible" @close="isProductDrawerVisible=false")
+    .private-placement-com-drawer-slot
         .private-placement-com-drawer-main-part
           h4
             i.iconfont &#xe690;
             span 信托功能
           ul.private-placement-com-drawer-main-btns.clearfix
-            li.active(v-for="item in drawerFilterBtnGroupOne" :key="item.id") {{item.name}}
+            li(v-for="(item,index) in drawerFilterBtnGroupOne" :key="item.id" :class="{ active: currentFilter.trustFunction == index }" @click="handleChoseFilter(index,item.id,'trustFunction')") {{item.name}}
         .private-placement-com-drawer-main-part(style="margin-top:66px;")
           h4
             i.iconfont &#xe690;
             span 主要投向行业
-          el-dropdown.private-placement-com-drawer-main-dropdown
+          el-dropdown.private-placement-com-drawer-main-dropdown(trigger="click")
             button.flex-b
-              span 更多菜单
+              span {{filterOptName.inverstIndustry}}
               i.iconfont &#xe61a;
             el-dropdown-menu.private-placement-com-drawer-main-dropdown-menu(slot="dropdown")
-              el-dropdown-item 黄金糕
-              el-dropdown-item r偶
-              el-dropdown-item r偶
+              el-dropdown-item(v-for="(item,index) in drawerFilterBtnGroupTwo" :key="item.id" :class="{ active: currentFilter.inverstIndustry == index }")
+                div( @click="handleChoseFilter(index,item.id,'inverstIndustry')") {{item.name}}
         .private-placement-com-drawer-main-part(style="margin-top:66px;")
           h4
             i.iconfont &#xe690;
             span 财产运用方式
-          el-dropdown.private-placement-com-drawer-main-dropdown
+          el-dropdown.private-placement-com-drawer-main-dropdown(trigger="click")
             button.flex-b
-              span 更多菜单
+              span {{filterOptName.propertyRightDesc}}
               i.iconfont &#xe61a;
             el-dropdown-menu.private-placement-com-drawer-main-dropdown-menu(slot="dropdown")
-              el-dropdown-item 黄金糕
-              el-dropdown-item r偶
-              el-dropdown-item r偶
-              el-dropdown-item r偶
+              el-dropdown-item(v-for="(item,index) in drawerFilterBtnGroupThree" :key="item.id" :class="{ active: currentFilter.propertyRightDesc == index }" )
+                div(@click="handleChoseFilter(index,item.id,'propertyRightDesc')") {{item.name}}
         .private-placement-com-drawer-main-operatebtns
           el-button-group
-            el-button.active 重置
-            el-button 确认
+            el-button(@click="resetFilter") 重置
+            el-button.active(@click="sureFilter") 确认
 </template>
 
 <script>
@@ -76,24 +75,216 @@ export default {
   components: {
     ProductDrawer
   },
+  props: {
+    list: Array
+  },
   data () {
     return {
       isProductDrawerVisible: false,
+      currentFilter: {
+        trustFunction: 0,
+        propertyRightDesc: 0,
+        inverstIndustry: 0
+      },
       drawerFilterBtnGroupOne: [
         {
-          id: 0,
-          name: '正在运作'
+          id: 2037,
+          name: '投资类'
         },
         {
-          id: 1,
-          name: '延期运作'
+          id: 2038,
+          name: '融资类'
         },
         {
-          id: 2,
-          name: '提前清算'
+          id: 2039,
+          name: '事务管理'
         }
-      ]
+      ],
+      drawerFilterBtnGroupTwo: [
+        {
+          id: 351,
+          name: '受托管理'
+        },
+        {
+          id: 352,
+          name: '自我管理'
+        },
+        {
+          id: 353,
+          name: '顾问管理'
+        }
+      ],
+      drawerFilterBtnGroupThree: [
+        {
+          id: 2031,
+          name: '其他'
+        },
+        {
+          id: 2032,
+          name: '持有并管理'
+        },
+        {
+          id: 2033,
+          name: '准资产证券化'
+        },
+        {
+          id: 2034,
+          name: '资产证券化'
+        },
+        {
+          id: 2035,
+          name: '出租'
+        },
+        {
+          id: 2036,
+          name: '出售'
+        }
+      ],
+      filterOpt: {},
+      filterOptName: {}
     }
+  },
+  created () {
+    this.getAllIndustry()
+    this.initFilter()
+  },
+  methods: {
+    getAllIndustry () {
+      this.$api.productinfo
+        .getAllIndustry({ administratorId: this.$route.query.id })
+        .then(res => {
+          console.log(res)
+          // let result = JSON.parse(res)
+          // this.drawerFilterBtnGroupTwo = result.data
+        })
+    },
+    handleChoseFilter (index, key, type) {
+      this.currentFilter[type] = index
+      this.filterOpt[type] = key
+
+      if (type === 'trustFunction') {
+        let trustFunctionFilter = this.$options.filters['trustFunctionFilter']
+        this.filterOptName[type] = trustFunctionFilter(key)
+      } else if (type === 'inverstIndustry') {
+        let inverstIndustryFilter = this.$options.filters[
+          'inverstIndustryFilter'
+        ]
+        this.filterOptName[type] = inverstIndustryFilter(key)
+      } else if (type === 'propertyRightDesc') {
+        let propertyRightDescFilter = this.$options.filters[
+          'propertyRightDescFilter'
+        ]
+        this.filterOptName[type] = propertyRightDescFilter(key)
+        console.log(this.filterOptName)
+      }
+    },
+    initFilter () {
+      this.filterOpt = {
+        trustFunction: this.drawerFilterBtnGroupOne[0].id,
+        inverstIndustry: this.drawerFilterBtnGroupTwo[0].id,
+        propertyRightDesc: this.drawerFilterBtnGroupThree[0].id
+      }
+      this.filterOptName = {
+        trustFunction: this.drawerFilterBtnGroupOne[0].name,
+        inverstIndustry: this.drawerFilterBtnGroupTwo[0].name,
+        propertyRightDesc: this.drawerFilterBtnGroupThree[0].name
+      }
+    },
+    resetFilter () {
+      this.currentFilter.trustFunction = 0
+      this.currentFilter.inverstIndustry = 0
+      this.currentFilter.propertyRightDesc = 0
+    },
+    sureFilter () {
+      this.isProductDrawerVisible = false
+      this.$emit('filterClose', this.filterOpt, this.filterOptName)
+    }
+  },
+  filters: {
+    trustFunctionFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (val) {
+        case 2037:
+          str = '投资类'
+          break
+        case 2038:
+          str = '融资类'
+          break
+        case 2039:
+          str = '事务管理'
+          break
+      }
+      return str
+    },
+    inverstIndustryFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (val) {
+        case 351:
+          str = '受托管理'
+          break
+        case 352:
+          str = '自我管理'
+          break
+        case 353:
+          str = '顾问管理'
+          break
+      }
+      return str
+    },
+    propertyRightDescFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (val) {
+        case 2031:
+          str = '暂行办法实施前'
+          break
+        case 2032:
+          str = '持有并管理'
+          break
+        case 2033:
+          str = '准资产证券化'
+          break
+        case 2034:
+          str = '资产证券化'
+          break
+        case 2035:
+          str = '出租'
+          break
+        case 2036:
+          str = '出售'
+          break
+      }
+      return str
+    }
+  },
+  watch: {
+    currentFilter: {
+      handler (val, newVal) {
+        this.filterOpt = {
+          trustFunction: this.drawerFilterBtnGroupOne[newVal.trustFunction].id,
+          inverstIndustry: this.drawerFilterBtnGroupTwo[newVal.inverstIndustry]
+            .id,
+          propertyRightDesc: this.drawerFilterBtnGroupThree[
+            newVal.propertyRightDesc
+          ].id
+        }
+        this.filterOptName = {
+          trustFunction: this.drawerFilterBtnGroupOne[newVal.trustFunction]
+            .name,
+          inverstIndustry: this.drawerFilterBtnGroupTwo[newVal.inverstIndustry]
+            .name,
+          propertyRightDesc: this.drawerFilterBtnGroupThree[
+            newVal.propertyRightDesc
+          ].name
+        }
+      },
+      deep: true
+    }
+  },
+  destroyed () {
+    this.$emit('destory')
   }
 }
 </script>

@@ -1,5 +1,5 @@
 // 倒入所有接口
-import apiList from './apiList/index'
+import apiList from 'config/apiList/index'
 
 const install = Vue => {
   if (install.installed) return

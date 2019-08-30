@@ -1,65 +1,39 @@
 <template lang="pug">
-  .private-placement-com-wrapper
-    .private-placement-com-filter
-      span 默认排序
-      span 588
-    el-collapse.private-placement-com-main(accordion)
-      el-collapse-item
-        template(slot="title")
-          i.first.iconfont &#xe690;
-          div
-            span.title 外贸信托-乐瑞强债2号尊享E期集合资金信托计划
-            p
-              span 正常清算
-              span 受托管理
-              span 暂行办法实施前
-        .collapse-content
-          .title
-            p 发行机构
-            h5 中国对外贸易经济信托有限公司
-          .main
-            p
-              span 产品编码
-              span ZXD44Z2019060100294499
-            p
-              span 首次申请登记日期
-              span 2019-08-08
-            p
-              span 存续期限（月）
-              span 47.5
-            p
-              span 主要投向行业
-              span 金融业
-            p
-              span 财产运用方式
-              span 资产及其收益权（不附回购）
-            p
-              span 公示日期
-              span 2019-08-13
-    product-drawer(:isProductDrawerVisible="isProductDrawerVisible" @close="isProductDrawerVisible=false")
-      .private-placement-com-drawer-slot
-        .private-placement-com-drawer-main-part
-          h4
-            i.iconfont &#xe690;
-            span 运作状态
-          ul.private-placement-com-drawer-main-btns.clearfix
-            li.active(v-for="item in drawerFilterBtnGroupOne" :key="item.id") {{item.name}}
-        .private-placement-com-drawer-main-part(style="margin-top:66px;")
-          h4
-            i.iconfont &#xe690;
-            span 管理类型
-          ul.private-placement-com-drawer-main-btns.clearfix
-            li.active(v-for="item in drawerFilterBtnGroupTwo" :key="item.id") {{item.name}}
-        .private-placement-com-drawer-main-part(style="margin-top:66px;")
-          h4
-            i.iconfont &#xe690;
-            span 备案阶段
-          ul.private-placement-com-drawer-main-btns.special.clearfix
-            li.active(v-for="item in drawerFilterBtnGroupThree" :key="item.id") {{item.name}}
-        .private-placement-com-drawer-main-operatebtns
-          el-button-group
-            el-button.active 重置
-            el-button 确认
+.private-placement-com-wrapper
+  el-collapse.private-placement-com-main(accordion)
+    el-collapse-item(v-for="item in list" :key="item.id" disabled)
+      template(slot="title")
+        i.first.iconfont &#xe690;
+        div
+          span.title {{item.fullName}}
+          p
+            span {{item.fundState | fundStateFilter}}
+            span {{item.managementType | managementTypeFilter}}
+            span {{item.methodImplementation | methodImplementationFilter}}
+  product-drawer(:isProductDrawerVisible="isProductDrawerVisible" @close="isProductDrawerVisible=false")
+    .private-placement-com-drawer-slot
+      .private-placement-com-drawer-main-part
+        h4
+          i.iconfont &#xe690;
+          span 运作状态
+        ul.private-placement-com-drawer-main-btns.clearfix
+          li(v-for="(item,index) in drawerFilterBtnGroupOne" :key="item.id" :class="{ active: currentFilter.fundState == index }" @click="handleChoseFilter(index,item.id,'fundState')") {{item.name}}
+      .private-placement-com-drawer-main-part(style="margin-top:66px;")
+        h4
+          i.iconfont &#xe690;
+          span 管理类型
+        ul.private-placement-com-drawer-main-btns.clearfix
+          li(v-for="(item,index) in drawerFilterBtnGroupTwo" :key="item.id" :class="{ active: currentFilter.managementType == index }" @click="handleChoseFilter(index,item.id,'managementType')") {{item.name}}
+      .private-placement-com-drawer-main-part(style="margin-top:66px;")
+        h4
+          i.iconfont &#xe690;
+          span 备案阶段
+        ul.private-placement-com-drawer-main-btns.special.clearfix
+          li(v-for="(item,index) in drawerFilterBtnGroupThree" :key="item.id" :class="{ active: currentFilter.methodImplementation == index }" @click="handleChoseFilter(index,item.id,'methodImplementation')") {{item.name}}
+      .private-placement-com-drawer-main-operatebtns
+        el-button-group
+          el-button(@click="resetFilter") 重置
+          el-button.active(@click="sureFilter") 确认
 </template>
 
 <script>
@@ -68,60 +42,199 @@ export default {
   components: {
     ProductDrawer
   },
+  props: {
+    list: Array
+  },
   data () {
     return {
       isProductDrawerVisible: false,
+      currentFilter: {
+        fundState: 0,
+        methodImplementation: 0,
+        managementType: 0
+      },
       drawerFilterBtnGroupOne: [
         {
-          id: 0,
+          id: 300,
           name: '正在运作'
         },
         {
-          id: 1,
+          id: 301,
           name: '延期运作'
         },
         {
-          id: 2,
+          id: 302,
           name: '提前清算'
         },
         {
-          id: 3,
+          id: 303,
           name: '正常清算'
         },
         {
-          id: 4,
+          id: 304,
           name: '非正常清算'
         },
         {
-          id: 5,
+          id: 305,
           name: '投顾协议终止'
         }
       ],
       drawerFilterBtnGroupTwo: [
         {
-          id: 0,
+          id: 351,
           name: '受托管理'
         },
         {
-          id: 1,
+          id: 352,
           name: '自我管理'
         },
         {
-          id: 2,
+          id: 353,
           name: '顾问管理'
         }
       ],
       drawerFilterBtnGroupThree: [
         {
-          id: 0,
+          id: 1,
           name: '暂行办法实施前'
         },
         {
-          id: 1,
+          id: 2,
           name: '暂行办法实施后'
         }
-      ]
+      ],
+      filterOpt: {},
+      filterOptName: {}
     }
+  },
+  created () {
+    this.initFilter()
+  },
+  methods: {
+    handleChoseFilter (index, key, type) {
+      this.currentFilter[type] = index
+      this.filterOpt[type] = key
+
+      if (type === 'fundState') {
+        let fundStateFilter = this.$options.filters['fundStateFilter']
+        this.filterOptName[type] = fundStateFilter(key)
+      } else if (type === 'managementType') {
+        let managementTypeFilter = this.$options.filters['managementTypeFilter']
+        this.filterOptName[type] = managementTypeFilter(key)
+      } else if (type === 'methodImplementation') {
+        let methodImplementationFilter = this.$options.filters[
+          'methodImplementationFilter'
+        ]
+        this.filterOptName[type] = methodImplementationFilter(key)
+      }
+    },
+    initFilter () {
+      this.filterOpt = {
+        fundState: this.drawerFilterBtnGroupOne[0].id,
+        managementType: this.drawerFilterBtnGroupTwo[0].id,
+        methodImplementation: this.drawerFilterBtnGroupThree[0].id
+      }
+      this.filterOptName = {
+        fundState: this.drawerFilterBtnGroupOne[0].name,
+        managementType: this.drawerFilterBtnGroupTwo[0].name,
+        methodImplementation: this.drawerFilterBtnGroupThree[0].name
+      }
+    },
+    resetFilter () {
+      this.currentFilter.fundState = 0
+      this.currentFilter.methodImplementation = 0
+      this.currentFilter.managementType = 0
+    },
+    sureFilter () {
+      this.isProductDrawerVisible = false
+      this.$emit('filterClose', this.filterOpt, this.filterOptName)
+    }
+  },
+  filters: {
+    fundStateFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (val) {
+        case 300:
+          str = '正在运作'
+          break
+        case 301:
+          str = '正常清算'
+          break
+        case 302:
+          str = '提前清算'
+          break
+        case 303:
+          str = '延期清算'
+          break
+        case 304:
+          str = '非正常清算'
+          break
+        case 305:
+          str = '投顾协议已终止'
+          break
+      }
+      return str
+    },
+    managementTypeFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (val) {
+        case 351:
+          str = '受托管理'
+          break
+        case 352:
+          str = '自我管理'
+          break
+        case 353:
+          str = '顾问管理'
+          break
+      }
+      return str
+    },
+    methodImplementationFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (val) {
+        case 1:
+          str = '暂行办法实施前'
+          break
+        case 2:
+          str = '暂行办法实施后'
+          break
+      }
+      return str
+    }
+  },
+  watch: {
+    currentFilter: {
+      handler (val, newVal) {
+        this.filterOpt = {
+          fundState: this.drawerFilterBtnGroupOne[newVal.fundState]
+            .id,
+          managementType: this.drawerFilterBtnGroupTwo[
+            newVal.managementType
+          ].id,
+          methodImplementation: this.drawerFilterBtnGroupThree[
+            newVal.methodImplementation
+          ].id
+        }
+        this.filterOptName = {
+          fundState: this.drawerFilterBtnGroupOne[newVal.fundState]
+            .name,
+          managementType: this.drawerFilterBtnGroupTwo[
+            newVal.managementType
+          ].name,
+          methodImplementation: this.drawerFilterBtnGroupThree[
+            newVal.methodImplementation
+          ].name
+        }
+      },
+      deep: true
+    }
+  },
+  destroyed () {
+    this.$emit('destory')
   }
 }
 </script>
@@ -188,19 +301,6 @@ export default {
 }
 .private-placement-com-wrapper {
 	background: #f8f8f8;
-	.private-placement-com-filter {
-		padding: 19px 36px;
-		border-bottom: 1px solid #eee;
-		span {
-			font-size: 24px;
-			line-height: 50px;
-			font-weight: bold;
-			color: #666;
-			&:nth-of-type(2) {
-				margin-left: 16px;
-			}
-		}
-	}
 	.private-placement-com-main {
 		.el-collapse-item {
 			padding: 44px 0;

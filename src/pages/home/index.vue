@@ -18,10 +18,10 @@
             p https://www.hwasbank.com
     home-modal(:isHomeModalVisible="isHomeModalVisible" @close="isHomeModalVisible=false")
       ul.home-modal-slot
-        li(v-for="item in mainInfoList" :key="item.id")
+        li(v-for="item in mainInfoList" :key="item.code")
           i.iconfont &#xe710;
-            span {{item.name}}
-          p {{item.info}}
+            span {{item.code | maininfoTitleFilter}}
+          p {{item.content}}
     .top-part
       iv-badge(dot :count="1" :offset="[105, -15]")
         el-avatar.top-part-avatar(:src="avatarUrl")
@@ -48,7 +48,7 @@
           img(:src="item.src")
           p {{item.name}}
       .main-part-product-info
-        .main-part-product-info-title.flex-b(@click="$router.push('/productinfo')")
+        .main-part-product-info-title.flex-b(@click="goProductInfo")
           h3 产品信息
           p 总数 35
             i.iconfont &#xe64d;
@@ -87,6 +87,7 @@ export default {
   },
   data () {
     return {
+      id: 1547451681262,
       isHomeDrawerVisible: false,
       isHomeModalVisible: false,
       avatarUrl: 'https://i.loli.net/2017/08/21/599a521472424.jpg',
@@ -166,26 +167,64 @@ export default {
         }
       ],
       // 异常机构
-      mainInfoList: [
-        {
-          id: 0,
-          name: '异常机构',
-          info: '未按要求进行产品更新或重大事项更新累计2次'
-        },
-        {
-          id: 1,
-          name: '其他诚信信息',
-          info: '未按要求进行产品更新或重大事项更新累计2次及以上'
-        }
-      ]
+      mainInfoList: []
+    }
+  },
+  filters: {
+    maininfoTitleFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (val) {
+        case 'outOfContact':
+          str = '失联机构'
+          break
+        case 'abnormal':
+          str = '异常机构'
+          break
+        case 'regulatoryMeasures':
+          str = '监管措施'
+          break
+        case 'falseSubmit':
+          str = '虚假填报'
+          break
+        case 'importantOmissions':
+          str = '重大遗漏'
+          break
+        case 'violation':
+          str = '违反规定'
+          break
+        case 'dishonesty':
+          str = '不诚信记录'
+          break
+        case 'otheHonesty':
+          str = '其他诚信记录'
+          break
+      }
+      return str
     }
   },
   methods: {
     showWarningPart () {
-      this.isHomeModalVisible = true
-      this.$api.home.getHonestyInfo().then(res => {
-        console.log(res)
+      let param = {
+        administratorId: this.id
+      }
+      this.$api.home.getHonestyInfo(param).then(res => {
+        let result = JSON.parse(res)
+        let arr = []
+        let temp = { ...result.data }
+        this.isHomeModalVisible = result.data.flag
+        delete temp.flag
+        for (let key in temp) {
+          arr.push({
+            code: key,
+            content: temp[key]
+          })
+        }
+        this.mainInfoList = [...arr]
       })
+    },
+    goProductInfo () {
+      this.$router.push({ path: '/productinfo', query: { id: this.id } })
     }
   }
 }

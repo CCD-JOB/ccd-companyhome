@@ -1,4 +1,4 @@
-import axios from './../api'
+import axios from 'utils/http/api'
 
 export const getHonestyInfo = params => {
   return axios({
