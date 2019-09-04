@@ -1,29 +1,33 @@
 <template lang="pug">
   ul.land-pledge-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.id")
       .land-pledge-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
       dl.land-pledge-info
         dt  土地坐落：
-        dd （2018）沪0015民初45468号
+        dd {{item.address}}
         dt  抵押土地用途：
-        dd  上海联伟信息技术有限公司
+        dd  {{item.purpose}}
         dt  抵押面积（公顷）：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.area}}
         dt  起止时间：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.startStopTime}}
       .land-pledge-divider
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'land-pledge',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'landMortgages')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -59,7 +63,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

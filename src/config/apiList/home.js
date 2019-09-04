@@ -7,7 +7,15 @@ export const getHonestyInfo = params => {
   })
 }
 
+export const getOpinionInfo = params => {
+  return axios({
+    url: '/infor/getOpinionInfo',
+    params
+  })
+}
+
 // 默认全部倒出
 export default {
-  getHonestyInfo
+  getHonestyInfo,
+  getOpinionInfo
 }

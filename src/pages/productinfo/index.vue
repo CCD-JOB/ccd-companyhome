@@ -7,21 +7,21 @@
           span(@click="handleSwitch(2)" :class="{ active: currentSelect == 2 }") 信托
         i.iconfont(@click="handleShowFilter") &#xe62d;
       .private-info-filter
-        span {{totalFilter}}
-        span {{totalNum}}
+        span {{totalFilterName}}
+        span {{listInfo.totalNum}}
     .product-info-main-wrapper
       scroll-com(
         ref="scrollCom"
         pullup
-        @scrollToEnd="handleLoadMore"
         :data="list"
+        @scrollToEnd="handleLoadMore"
       )
         component(
           ref="componentRef"
           :is="currentTabComponent[currentSelect-1]"
           :list="list"
-          @destory="componentDestoryed"
-          @filterClose="filterClose"
+          @destory="handleComponentDestoryed"
+          @filterClose="handleFilterClose"
         )
 </template>
 
@@ -29,7 +29,6 @@
 import ScrollCom from 'components/ScrollCom'
 import PrivatePlacementCom from './component/PrivatePlacementCom'
 import TrustCom from './component/TrustCom'
-import { log } from 'util'
 export default {
   components: {
     PrivatePlacementCom,
@@ -39,8 +38,10 @@ export default {
   data () {
     return {
       list: [],
-      totalNum: 0,
-      totalFilter: '' || '默认排序',
+      listInfo: {
+        totalNum: 0,
+        totalPages: 0
+      },
       queryParam: {
         startPage: 1,
         pageSize: 10,
@@ -49,11 +50,11 @@ export default {
         fundState: '',
         methodImplementation: '',
         managementType: '',
-
         trustFunction: '',
         inverstIndustry: '',
         propertyRightDesc: ''
       },
+      totalFilterName: '' || '默认排序',
       currentSelect: 1,
       currentTabComponent: ['private-placement-com', 'trust-com']
     }
@@ -64,21 +65,6 @@ export default {
     this.getDataList()
   },
   methods: {
-    async getDataList () {
-      try {
-        let result = await this.$api.productinfo
-          .getProductList(this.queryParam)
-          .then(res => {
-            return JSON.parse(res)
-          })
-
-        if (!result.data.list.length || result.code !== 200) return
-        this.list = [...this.list].concat(result.data.list)
-        this.totalNum = result.data.total
-      } catch (error) {
-        console.log(error)
-      }
-    },
     resetParam () {
       this.list = []
       this.queryParam = {
@@ -93,38 +79,70 @@ export default {
         inverstIndustry: '',
         propertyRightDesc: ''
       }
+      this.listInfo = {
+        totalNum: 0,
+        totalPages: 0
+      }
     },
+    async getDataList () {
+      try {
+        let result = await this.$api.productinfo
+          .getProductList(this.queryParam)
+          .then(res => {
+            return JSON.parse(res)
+          })
+
+        if (!result.data.list.length || result.code !== 200) {
+          this.$refs.scrollCom.forceUpdate()
+          return
+        }
+        this.list = [...this.list].concat(result.data.list)
+        this.listInfo.totalNum = result.data.total
+        this.listInfo.totalPages = result.data.pages
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    // 加载更多
+    handleLoadMore () {
+      if (this.queryParam.startPage >= this.listInfo.totalPages) {
+        this.$refs.scrollCom.forceUpdate()
+        return
+      }
+      this.queryParam.startPage++
+      this.getDataList()
+    },
+    // 切换组件
     handleSwitch (type) {
+      if (this.currentSelect === type) return
       this.currentSelect = type
       this.resetParam()
       this.getDataList()
     },
-    handleLoadMore () {
-      this.queryParam.startPage++
-      this.getDataList()
-    },
-    filterClose (filterOpt, filterOptName) {
+    // 销毁组件
+    handleComponentDestoryed () {
       this.resetParam()
-      this.queryParam = Object.assign(this.queryParam, filterOpt)
-
+      this.$refs.scrollCom.destroy()
+      this.$refs.scrollCom._initScroll()
+    },
+    // 展示筛选框
+    handleShowFilter () {
+      this.$refs.componentRef.isProductDrawerVisible = true
+    },
+    // 关闭筛选框
+    handleFilterClose (filterOpt, filterOptName) {
       let arr = []
       for (let idx in filterOptName) {
         arr.push(filterOptName[idx])
       }
 
       if (arr.length) {
-        this.totalFilter = arr.join(' / ')
+        this.totalFilterName = arr.join(' / ')
       }
 
-      this.getDataList()
-    },
-    componentDestoryed () {
       this.resetParam()
-      this.$refs.scrollCom.destroy()
-      this.$refs.scrollCom._initScroll()
-    },
-    handleShowFilter () {
-      this.$refs.componentRef.isProductDrawerVisible = true
+      this.queryParam = Object.assign(this.queryParam, filterOpt)
+      this.getDataList()
     }
   }
 }

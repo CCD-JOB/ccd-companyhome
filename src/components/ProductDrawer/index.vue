@@ -1,5 +1,5 @@
 <template lang="pug">
-  el-drawer.product-drawer(title="筛选"
+  el-drawer.product-drawer(:title="drawerTitle"
   :visible.sync="isProductDrawerVisible"
   :direction="direction"
   :before-close="closeDrawer")
@@ -9,7 +9,8 @@
 <script>
 export default {
   props: {
-    isProductDrawerVisible: Boolean
+    isProductDrawerVisible: Boolean,
+    drawerTitle: String
   },
   data () {
     return {

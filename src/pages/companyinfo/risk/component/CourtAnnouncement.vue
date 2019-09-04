@@ -1,29 +1,33 @@
 <template lang="pug">
   ul.court-announcement-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.id")
       .court-announcement-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
       dl.court-announcement-info
         dt  当事人：
-        dd （2018）沪0015民初45468号
+        dd  {{item.defendant}}
         dt  公告人：
-        dd  上海联伟信息技术有限公司
+        dd  {{item.court}}
         dt  公告类型：
-        dd （2018）沪0015民初45468号
+        dd  {{item.announcementType}}
         dt  刊登日期：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.publicationDate}}
       .court-announcement-divider
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'court-announcement',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'court')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -59,7 +63,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

@@ -1,19 +1,41 @@
 <template lang="pug">
 .risk-info-wrapper
   el-container.risk-info-layout
-    el-aside(width="216px").risk-info-sider
+    el-aside.risk-info-sider
       scroll-com
         ul
-          li(v-for="(item,index) in siderMenuList" :key="item.id" :class="current===index?'active':''" @click="current=index")
+          li(
+            v-for="(item,index) in siderMenuList"
+            :key="item.id"
+            :class="current===index ? 'active' : ''"
+            @click="switchCom(index)"
+          )
             span {{item.name}}
             span {{item.num}}
     el-main.risk-info-content(ref="riskSrcollWrapper")
       .risk-info-title.flex-b
         h3 {{siderMenuList[current].name}} {{siderMenuList[current].num}}
-        p 全部
+        p(v-if="!dropdownList.length") 全部
           i.iconfont &#xe622;
-      scroll-com(ref="scrollCom")
-        component(v-bind:is="currentTabComponent[current]" @destory="destory")
+        el-dropdown(v-if="dropdownList.length" trigger="click").risk-info-title-sp
+          span.el-dropdown-link {{dropdownList[0].name}}
+            i.iconfont &#xe622;
+          el-dropdown-menu.risk-info-dropdown(slot="dropdown")
+            el-dropdown-item(v-for="item in dropdownList" :key="item.id")
+              div(@click="handleChoseFilter(item)") {{item.name}}
+      scroll-com(
+        ref="scrollCom"
+        pullup
+        pulldown
+        :data="list"
+        @scrollToEnd="handleLoadMore"
+      )
+        component(
+          :is="currentTabComponent[current]"
+          @comCreated="comCreated"
+          @comDestory="comDestory"
+          :list="list"
+        )
 </template>
 <script>
 import ScrollCom from 'components/ScrollCom'
@@ -32,142 +54,216 @@ import JudicialAuction from './component/JudicialAuction'
 import ClearInformation from './component/ClearInformation'
 import LandPledge from './component/LandPledge'
 import FinalCase from './component/FinalCase'
-import EquityPledge from './component/EquityPledge'
 
 export default {
-  components: {
-    ScrollCom,
-    OpeningNotice,
-    LegalProceedings,
-    CourtAnnouncement,
-    BreakFaith,
-    Executee,
-    JudicialAssistance,
-    FilingInformation,
-    AbnormalOperation,
-    AdministrativeSanction,
-    EquityDisposal,
-    TaxArrears,
-    JudicialAuction,
-    ClearInformation,
-    LandPledge,
-    FinalCase,
-    EquityPledge
-  },
-  data () {
-    return {
-      currentTabComponent: [
-        'opening-notice',
-        'legal-proceedings',
-        'court-announcement',
-        'break-faith',
-        'executee',
-        'judicial-assistance',
-        'filing-information',
-        'abnormal-operation',
-        'administrative-sanction',
-        'equity-disposal',
-        'tax-arrears',
-        'judicial-auction',
-        'clear-information',
-        'land-pledge',
-        'final-case',
-        'equity-pledge'
-      ],
-      current: 0,
-      siderMenuList: [
-        {
-          id: 0,
-          name: '开庭公告',
-          num: 1069
-        },
-        {
-          id: 1,
-          name: '法律诉讼',
-          num: 101
-        },
-        {
-          id: 2,
-          name: '法院公告',
-          num: ''
-        },
-        {
-          id: 3,
-          name: '失信信息',
-          num: ''
-        },
-        {
-          id: 4,
-          name: '被执行人',
-          num: ''
-        },
-        {
-          id: 5,
-          name: '司法协助',
-          num: ''
-        },
-        {
-          id: 6,
-          name: '立案信息',
-          num: ''
-        },
-        {
-          id: 7,
-          name: '经营异常',
-          num: ''
-        },
-        {
-          id: 8,
-          name: '行政处罚',
-          num: ''
-        },
-        {
-          id: 9,
-          name: '股权出质',
-          num: ''
-        },
-        {
-          id: 10,
-          name: '欠税公告',
-          num: ''
-        },
-        {
-          id: 11,
-          name: '司法拍卖',
-          num: ''
-        },
-        {
-          id: 12,
-          name: '清算信息',
-          num: ''
-        },
-        {
-          id: 13,
-          name: '土地抵押',
-          num: ''
-        },
-        {
-          id: 14,
-          name: '终本案件',
-          num: ''
-        },
-        {
-          id: 15,
-          name: '股权质押',
-          num: ''
-        }
-      ]
-    }
-  },
-  methods: {
-    destory () {
-      this.$refs.scrollCom._initScroll()
-    }
-  }
+	components: {
+		ScrollCom,
+		OpeningNotice,
+		LegalProceedings,
+		CourtAnnouncement,
+		BreakFaith,
+		Executee,
+		JudicialAssistance,
+		FilingInformation,
+		AbnormalOperation,
+		AdministrativeSanction,
+		EquityDisposal,
+		TaxArrears,
+		JudicialAuction,
+		ClearInformation,
+		LandPledge,
+		FinalCase
+	},
+	data() {
+		return {
+			currentTabComponent: [
+				'opening-notice',
+				'legal-proceedings',
+				'court-announcement',
+				'break-faith',
+				'executee',
+				'judicial-assistance',
+				'filing-information',
+				'abnormal-operation',
+				'administrative-sanction',
+				'equity-disposal',
+				'tax-arrears',
+				'judicial-auction',
+				'clear-information',
+				'land-pledge',
+				'final-case'
+			],
+			siderMenuList: [
+				{
+					id: 'announcement',
+					name: '开庭公告',
+					num: 1069
+				},
+				{
+					id: 'lawsuit',
+					name: '法律诉讼',
+					num: 101
+				},
+				{
+					id: 'court',
+					name: '法院公告',
+					num: ''
+				},
+				{
+					id: 'dishonest',
+					name: '失信信息',
+					num: ''
+				},
+				{
+					id: 'implement',
+					name: '被执行人',
+					num: ''
+				},
+				{
+					id: 'judicialAid',
+					name: '司法协助',
+					num: ''
+				},
+				{
+					id: 'courtRegister',
+					name: '立案信息',
+					num: ''
+				},
+				{
+					id: 'abnormalPut/abnormalRemove',
+					name: '经营异常',
+					num: ''
+				},
+				{
+					id: 'punish/creditChina',
+					name: '行政处罚',
+					num: ''
+				},
+				{
+					id: 'equity',
+					name: '股权出质',
+					num: ''
+				},
+				{
+					id: 'towntax',
+					name: '欠税公告',
+					num: ''
+				},
+				{
+					id: 'judicialSale',
+					name: '司法拍卖',
+					num: ''
+				},
+				{
+					id: 'clearing',
+					name: '清算信息',
+					num: ''
+				},
+				{
+					id: 'landMortgages',
+					name: '土地抵押',
+					num: ''
+				},
+				{
+					id: 'endCase',
+					name: '终本案件',
+					num: ''
+				}
+			],
+			current: 0,
+			queryParam: {
+				startPage: 1,
+				pageSize: 10,
+				companyId: '',
+				discriminate: 'announcement'
+			},
+			list: [],
+			listInfo: {},
+			dropdownList: []
+		}
+	},
+	created() {
+		// this.queryParam.companyId = this.$route.query.id
+		this.queryParam.companyId = 1710
+		this.getDataList()
+	},
+	methods: {
+		resetParam() {
+			this.list = []
+			this.queryParam.startPage = 1
+		},
+		async getDataList() {
+			try {
+				let result = await this.$api.companyinfo
+					.getShowVenture(this.queryParam)
+					.then(res => {
+						return JSON.parse(res)
+					})
+				this.list = this.list.concat(result.data.list)
+				this.listInfo.totalPages = result.data.pages
+			} catch (error) {
+				console.log(error)
+			}
+		},
+		// 加载更多
+		handleLoadMore() {
+			if (this.queryParam.startPage >= this.listInfo.totalPages) {
+				this.$refs.scrollCom.forceUpdate()
+				return
+			}
+			this.queryParam.startPage++
+			this.getDataList()
+		},
+		// 切换组件
+		switchCom(index) {
+			this.current = index
+			this.dropdownList = []
+			this.resetParam()
+			this.getDataList()
+		},
+		comCreated(type, dropdownList) {
+			this.queryParam.discriminate = type
+			if (dropdownList) this.dropdownList = dropdownList
+		},
+		comDestory() {
+			this.$refs.scrollCom && this.$refs.scrollCom.scrollTo(0, 0)
+			this.$refs.scrollCom && this.$refs.scrollCom.destroy()
+			this.$refs.scrollCom && this.$refs.scrollCom._initScroll()
+		},
+		// 当有筛选时处理，暂时用不上
+		handleChoseFilter(item) {
+			this.queryParam.discriminate = item.id
+			this.resetParam()
+			this.getDataList()
+		}
+	}
 }
 </script>
 
 <style lang="scss">
+.risk-info-dropdown {
+	width: calc(100% - 200px);
+	top: 60px !important;
+	left: 200px !important;
+	background: #f8f8f8;
+	padding: 27px 28px 27px 37px;
+	margin: 0;
+	box-shadow: none;
+	border: none;
+	box-sizing: border-box;
+	.el-dropdown-menu__item {
+		font-size: 26px;
+		line-height: 56px;
+		text-align: center;
+		padding: 10px 0;
+		&:focus,
+		&:hover {
+			border-radius: 8px;
+			background: #1253fc;
+			color: #fff;
+		}
+	}
+}
 .risk-info-wrapper {
 	position: fixed;
 	top: 0;
@@ -190,6 +286,7 @@ export default {
 					line-height: 77px;
 					color: #fff;
 					font-weight: 500;
+					padding-left: 5px;
 					&:nth-of-type(2) {
 						font-size: 22px;
 					}
@@ -223,6 +320,18 @@ export default {
 				font-weight: 500;
 				line-height: 56px;
 				color: #666;
+				i {
+					font-size: 18px;
+					color: #666;
+					margin-left: 16px;
+				}
+			}
+			.risk-info-title-sp {
+				font-size: 18px;
+				font-weight: 500;
+				line-height: 56px;
+				color: #666;
+				outline: none;
 				i {
 					font-size: 18px;
 					color: #666;

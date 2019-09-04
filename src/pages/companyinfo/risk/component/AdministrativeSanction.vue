@@ -1,29 +1,33 @@
 <template lang="pug">
   ul.administrative-sanction-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.id")
       .administrative-sanction-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
       dl.administrative-sanction-info
         dt  决定书文号：
-        dd （2018）沪0015民初45468号
+        dd  {{item.documentNumber}}
         dt  处罚事由：
-        dd  上海联伟信息技术有限公司
+        dd  {{item.penaltyReason}}
         dt  决定机关：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.decisionOrgan}}
         dt  处罚决定日期：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.penaltyDecisionDate}}
       .administrative-sanction-divider
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'administrative-sanction',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'punish')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -59,7 +63,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

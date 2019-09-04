@@ -1,27 +1,31 @@
 <template lang="pug">
   ul.filing-information-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.id")
       .filing-information-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
       dl.filing-information-info
         dt  案由：
-        dd （2018）沪0015民初45468号
+        dd  {{item.caseOfAction}}
         dt  案号：
-        dd  上海联伟信息技术有限公司
+        dd  {{item.caseNumber}}
         dt  立案日期：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.filingDate}}
       .filing-information-divider
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'filing-information',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'courtRegister')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -57,7 +61,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

@@ -1,9 +1,9 @@
 <template lang="pug">
   ul.equity-pledge-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.id")
       .equity-pledge-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
       dl.equity-pledge-info
         .flex-b
@@ -47,11 +47,15 @@
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'equity-pledge',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'equityPledge')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -87,7 +91,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

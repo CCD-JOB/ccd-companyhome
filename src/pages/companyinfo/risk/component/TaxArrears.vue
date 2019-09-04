@@ -1,29 +1,33 @@
 <template lang="pug">
   ul.tax-arrears-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.id")
       .tax-arrears-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
       dl.tax-arrears-info
         dt  欠税税种：
-        dd （2018）沪0015民初45468号
+        dd {{item.taxArrears}}
         dt  欠税余额：
-        dd  上海联伟信息技术有限公司
+        dd  {{item.taxBalance}}
         dt  当前新发生的欠税余额：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.newTaxBalance}}
         dt  发布日期：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.publicationDate}}
       .tax-arrears-divider
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'tax-arrears',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'towntax')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -59,7 +63,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

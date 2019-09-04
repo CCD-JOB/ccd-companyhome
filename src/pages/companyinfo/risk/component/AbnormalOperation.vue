@@ -1,29 +1,35 @@
 <template lang="pug">
   ul.abnormal-operation-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.id")
       .abnormal-operation-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
       dl.abnormal-operation-info
         dt  列入经营异常名录原因：
-        dd （2018）沪0015民初45468号
+        dd  {{item.inclusionReason}}
         dt  列入日期：
-        dd  上海联伟信息技术有限公司
+        dd  {{item.inclusionDate}}
         dt  移出经营异常名录原因：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.removalReason}}
+        dt  移出日期：
+        dd  {{item.removalDate}}
         dt  做出决定机关：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.decisionOrgan}}
       .abnormal-operation-divider
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'abnormal-operation',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'abnormalRemove')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -59,7 +65,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

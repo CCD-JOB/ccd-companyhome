@@ -1,31 +1,51 @@
 <template lang="pug">
   ul.judicial-auction-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.auctionNotice")
       .judicial-auction-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
-        p 海南省高级人民法院关于海南省陵水县光坡镇香水湾B区国有土地使用权及地上建筑物（第二次拍卖）的公告（二次）
+        p {{item.auctionNotice}}
       dl.judicial-auction-info
         .flex-b
           div
             dt  评估价：
-            dd(style="width:217px;") 0.00
+            dd(style="width:217px;") {{item.auctionTarget | startFilter}}
           div
             dt  起拍价：
-            dd(style="width:217px;")  0.00
+            dd(style="width:217px;")  {{item.auctionTarget | judgeFilter}}
         dt  公告时间：
-        dd （2018）沪0015民初45468号
+        dd  {{item.publicationDate}}
       .judicial-auction-divider
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'judicial-auction',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'judicialSale')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
+  },
+  filters: {
+    judgeFilter: val => {
+      let str = ''
+      if (!val) return str
+      let str2 = val.split('起拍价格：')
+      str = str2[1].split('评估价格：')
+      return str[1]
+    },
+    startFilter: val => {
+      let str = ''
+      if (!val) return str
+      let str2 = val.split('起拍价格：')
+      str = str2[1].split('评估价格：')
+      return str[0]
+    }
   }
 }
 </script>
@@ -67,7 +87,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

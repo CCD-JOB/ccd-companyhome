@@ -10,7 +10,7 @@
             span {{item.fundState | fundStateFilter}}
             span {{item.managementType | managementTypeFilter}}
             span {{item.methodImplementation | methodImplementationFilter}}
-  product-drawer(:isProductDrawerVisible="isProductDrawerVisible" @close="isProductDrawerVisible=false")
+  product-drawer(:isProductDrawerVisible="isProductDrawerVisible" @close="isProductDrawerVisible=false"  :drawerTitle='drawerTitle')
     .private-placement-com-drawer-slot
       .private-placement-com-drawer-main-part
         h4
@@ -47,6 +47,7 @@ export default {
   },
   data () {
     return {
+      drawerTitle: '筛选',
       isProductDrawerVisible: false,
       currentFilter: {
         fundState: 0,
@@ -60,7 +61,7 @@ export default {
         },
         {
           id: 301,
-          name: '延期运作'
+          name: '正常清算'
         },
         {
           id: 302,
@@ -68,7 +69,7 @@ export default {
         },
         {
           id: 303,
-          name: '正常清算'
+          name: '延期清算'
         },
         {
           id: 304,
@@ -210,21 +211,17 @@ export default {
     currentFilter: {
       handler (val, newVal) {
         this.filterOpt = {
-          fundState: this.drawerFilterBtnGroupOne[newVal.fundState]
+          fundState: this.drawerFilterBtnGroupOne[newVal.fundState].id,
+          managementType: this.drawerFilterBtnGroupTwo[newVal.managementType]
             .id,
-          managementType: this.drawerFilterBtnGroupTwo[
-            newVal.managementType
-          ].id,
           methodImplementation: this.drawerFilterBtnGroupThree[
             newVal.methodImplementation
           ].id
         }
         this.filterOptName = {
-          fundState: this.drawerFilterBtnGroupOne[newVal.fundState]
+          fundState: this.drawerFilterBtnGroupOne[newVal.fundState].name,
+          managementType: this.drawerFilterBtnGroupTwo[newVal.managementType]
             .name,
-          managementType: this.drawerFilterBtnGroupTwo[
-            newVal.managementType
-          ].name,
           methodImplementation: this.drawerFilterBtnGroupThree[
             newVal.methodImplementation
           ].name

@@ -1,25 +1,28 @@
 <template lang="pug">
   .clear-information-wrapper
-    dl.clear-information-info
-      dt  清算组负责人
-      dd.flex-s
-        img(src="https://i.loli.net/2017/08/21/599a521472424.jpg")
-        span 丁松良
-      .clear-information-divider
-    dl.clear-information-info
-      dt  清算组成员
-        dd.flex-s
+    ul.clear-information-info
+      li(v-for="(item,index) in list" :key="item.id")
+        h4 清算组负责人
+        .flex-s
           img(src="https://i.loli.net/2017/08/21/599a521472424.jpg")
-          span 丁松良
+          span {{item.personInCharge}}
+        h4 清算组成员
+        .flex-s
+          img(src="https://i.loli.net/2017/08/21/599a521472424.jpg")
+          span {{item.members}}
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'clear-information',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'clearing')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -30,13 +33,13 @@ export default {
 	background: #ffffff;
 	.clear-information-info {
 		padding: 40px 20px 0 38px;
-		dt {
+		h4 {
 			font-size: 26px;
 			line-height: 56px;
 			font-weight: 500;
 			color: #333;
 		}
-		dd {
+		div {
 			padding: 26px 0;
 			img {
 				width: 62px;

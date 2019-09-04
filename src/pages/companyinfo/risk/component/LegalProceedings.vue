@@ -1,33 +1,36 @@
 <template lang="pug">
   ul.legal-proceedings-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.id")
       .legal-proceedings-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
-        p 汉华易美（天津）图像技术有限公司与华夏希志尤以（上海）图像影技术有限公司保证合同纠纷其他执行裁定书
+        p {{item.caseName}}
       dl.legal-proceedings-info
         dt  案号:
-        dd （2018）沪0015民初45468号
+        dd  {{item.caseNumber}}
         dt  案由：
-        dd  上海联伟信息技术有限公司
+        dd  {{item.caseOfAction}}
         dt  发布日期：
-        dd （2018）沪0015民初45468号
+        dd  {{item.publishedDate}}
         dt  案件身份：
         dd.special
-          p 原告：大时代汉华易美（天津）图像技术有限公司
-          p 被告：大时代汉华易美（天津）图像技术有限公司
-
+          p 原告：{{item.caseIdentity}}
+          p 被告：{{item.companyName}}
       .legal-proceedings-divider
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'legal-proceedings',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'lawsuit')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -69,7 +72,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

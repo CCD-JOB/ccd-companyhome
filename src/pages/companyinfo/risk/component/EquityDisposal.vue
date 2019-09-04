@@ -1,31 +1,35 @@
 <template lang="pug">
   ul.equity-disposal-wrapper
-    li
+    li(v-for="(item,index) in list" :key="item.id")
       .equity-disposal-title
         .flex-b
-          em 01
+          em {{String(index+1).padStart(2, '0')}}
           i.iconfont &#xe64d;
       dl.equity-disposal-info
         dt  出质人：
-        dd （2018）沪0015民初45468号
+        dd {{item.pledgor}}
         dt  质权人：
-        dd  上海联伟信息技术有限公司
+        dd  {{item.pledgee}}
         dt  出质股权数额：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.equityAmount}}
         dt  股权出质设立登记日期：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.registrationDate}}
         dt  状态：
-        dd  华设资产管理（上海）有限公司
+        dd  {{item.state}}
       .equity-disposal-divider
 </template>
 
 <script>
 export default {
-  data () {
-    return {}
+  name: 'equality-disposal',
+  props: {
+    list: Array
+  },
+  created () {
+    this.$emit('comCreated', 'equity')
   },
   destroyed () {
-    this.$emit('destory')
+    this.$emit('comDestory')
   }
 }
 </script>
@@ -61,7 +65,7 @@ export default {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
-				padding-left: 22px;
+				padding: 0 22px;
 				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;

@@ -33,7 +33,7 @@
           p
             span 公示日期
             span {{publicityDate}}
-  product-drawer(:isProductDrawerVisible="isProductDrawerVisible" @close="isProductDrawerVisible=false")
+  product-drawer(:isProductDrawerVisible="isProductDrawerVisible" @close="isProductDrawerVisible=false" :drawerTitle='drawerTitle')
     .private-placement-com-drawer-slot
         .private-placement-com-drawer-main-part
           h4
@@ -80,6 +80,7 @@ export default {
   },
   data () {
     return {
+      drawerTitle: '筛选',
       isProductDrawerVisible: false,
       currentFilter: {
         trustFunction: 0,
