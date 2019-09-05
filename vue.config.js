@@ -36,7 +36,9 @@ module.exports = {
       ]
     }
   },
-  devServer: {}
+  devServer: {
+    
+  }
 }
 
 function resolve (dir) {

@@ -7,14 +7,15 @@
           li(
             v-for="(item,index) in siderMenuList"
             :key="item.id"
-            :class="current===index ? 'active' : ''"
-            @click="switchCom(index)"
+            :class="[{active: current===index },{noInfo: item.num === 0}]"
+            @click="item.num !== 0?switchCom(index):''"
           )
             span {{item.name}}
-            span {{item.num}}
+            span(v-if="item.num !== 0") {{item.num}}
     el-main.risk-info-content(ref="riskSrcollWrapper")
       .risk-info-title.flex-b
-        h3 {{siderMenuList[current].name}} {{siderMenuList[current].num}}
+        h3 {{siderMenuList[current].name}}
+          span(v-if="siderMenuList[current].num !== 0") {{siderMenuList[current].num}}
         p(v-if="!dropdownList.length") 全部
           i.iconfont &#xe622;
         el-dropdown(v-if="dropdownList.length" trigger="click").risk-info-title-sp
@@ -129,12 +130,12 @@ export default {
           num: ''
         },
         {
-          id: 'abnormalPut/abnormalRemove',
+          id: 'abnormalRemove',
           name: '经营异常',
           num: ''
         },
         {
-          id: 'punish/creditChina',
+          id: 'punish',
           name: '行政处罚',
           num: ''
         },
@@ -176,6 +177,7 @@ export default {
         companyId: '',
         discriminate: 'announcement'
       },
+      listNavList: [],
       list: [],
       listInfo: {},
       dropdownList: []
@@ -184,12 +186,32 @@ export default {
   created () {
     // this.queryParam.companyId = this.$route.query.id
     this.queryParam.companyId = 1710
+    this.getDataInfo()
     this.getDataList()
   },
   methods: {
     resetParam () {
       this.list = []
       this.queryParam.startPage = 1
+    },
+    async getDataInfo () {
+      try {
+        let result = await this.$api.companyinfo
+          .getShowVentureCount({ companyId: this.queryParam.companyId })
+          .then(res => {
+            return JSON.parse(res)
+          })
+        this.siderMenuList.map(item => {
+          for (const key in result.data) {
+            if (result.data.hasOwnProperty(key) && item.id === key) {
+              const element = result.data[key]
+              item.num = element
+            }
+          }
+        })
+      } catch (error) {
+        console.log(error)
+      }
     },
     async getDataList () {
       try {
@@ -235,6 +257,18 @@ export default {
       this.resetParam()
       this.getDataList()
     }
+  },
+  filters: {
+    navlistFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (val) {
+        case 'announcement':
+          str = '开庭公告'
+          break
+      }
+      return val
+    }
   }
 }
 </script>
@@ -272,6 +306,7 @@ export default {
 	.risk-info-layout {
 		height: 100%;
 		.risk-info-sider {
+			width: 216px !important;
 			background: #1253fc;
 			ul {
 				li {
@@ -292,6 +327,9 @@ export default {
 						span {
 							color: #000;
 						}
+					}
+					&.noInfo {
+						opacity: 0.38;
 					}
 				}
 			}

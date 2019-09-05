@@ -8,6 +8,7 @@ export default function init (el, resp) {
   const nodeConf = {
     fillColor: {
       基金: 'rgb(255, 76, 10)',
+      信托: '#449d44',
       管理人: 'rgb(35, 148, 206)',
       基金经理: 'rgb(255,215,0)',
       托管人: 'rgb(255,162,208)',

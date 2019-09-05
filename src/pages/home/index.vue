@@ -14,9 +14,10 @@
     @scroll="scroll"
   )
     .top-part
-      iv-badge(dot :count="1" :offset="[160, -15]")
+      iv-badge.top-part-iv-badge(dot :count="1" )
         el-avatar.top-part-avatar(:src="avatarUrl")
-      button.top-part-btn 私募
+      button.top-part-btn
+        span 私募
     .main-part
       .main-part-icon-group
         i.iconfont(@click="isHomeDrawerVisible=true") &#xe935;
@@ -31,7 +32,7 @@
           span 2000w
       el-divider
       div.main-part-info(@click="isHomeModalVisible = mainInfoListInfo.flag") 异常机构
-        span 未按要求进行产品更新或着其他原因xxxxxxxxx
+        span 未按要求进行产品更新或着其他原因呵呵呵呵呵
         i.iconfont &#xe64d;
       el-divider
       ul.main-part-operate-list.clearfix
@@ -287,7 +288,8 @@ export default {
     },
     // 去到产品信息页
     handleGoProductInfo () {
-      this.$router.push({ path: '/productinfo', query: { id: this.id } })
+      this.isHomeAlertGoDialogVisible = true
+      // this.$router.push({ path: '/productinfo', query: { id: this.id } })
     },
     // 去到公司信息页
     handleGoHomeInfo (item) {
@@ -299,6 +301,14 @@ export default {
     },
     goDownload () {
       this.isHomeAlertGoDialogVisible = false
+      if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+        // Ios
+        window.location = 'https://itunes.apple.com/cn/app/id1449931291?mt=8'
+      } else if (/(Android)/i.test(navigator.userAgent)) {
+        // Android终端
+        window.location =
+					'https://sj.qq.com/myapp/detail.htm?apkName=com.lf.ccdapp'
+      }
     },
     // 监听滚动
     scroll (pos) {
@@ -538,7 +548,7 @@ export default {
 		align-items: top;
 		position: relative;
 		z-index: 1;
-		.ivu-badge {
+		.top-part-iv-badge {
 			.top-part-avatar {
 				width: 144px;
 				height: 144px;
@@ -547,6 +557,8 @@ export default {
 			.ivu-badge-dot {
 				width: 30px;
 				height: 30px;
+				margin-top: 120px;
+				margin-left: -10px;
 			}
 		}
 		.top-part-btn {
@@ -554,9 +566,11 @@ export default {
 			background: #1253fc;
 			border-radius: 8px;
 			height: 40px;
-			padding: 6px 20px;
 			font-size: 22px;
 			color: #fff;
+			span {
+				padding: 8px 20px;
+			}
 		}
 	}
 	.main-part {

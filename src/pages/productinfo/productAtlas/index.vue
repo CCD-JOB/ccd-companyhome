@@ -22,7 +22,6 @@ export default {
       }
 
       let res = await this.$api.productinfo.getD3DataSource(param)
-      // console.log(data.results[0].data);
 
       var node = []
       var relationships = []
@@ -44,14 +43,14 @@ export default {
       for (let list in nodes) {
         // 修改nodes的结构
         for (let listSmall in nodes[list]) {
-          if (listSmall == 'labels') {
+          if (listSmall === 'labels') {
             var ds = nodes[list][listSmall][0] // 取出labels数组的值
 
             delete nodes[list][listSmall]
             nodes[list][listSmall] = ds
           }
 
-          if (listSmall == 'properties') {
+          if (listSmall === 'properties') {
             var name = nodes[list][listSmall].name
             var title = nodes[list][listSmall].full_name
 
@@ -71,7 +70,7 @@ export default {
           var flag = true
 
           for (var c = 0; c < relations.length; c++) {
-            if (relationships[t][y].id == relations[c].id) {
+            if (relationships[t][y].id === relations[c].id) {
               flag = false
             }
           }
@@ -85,10 +84,10 @@ export default {
 
       for (let listTwo in relations) {
         for (let lisTwoSamll in relations[listTwo]) {
-          if (lisTwoSamll == '') {
-            if (lisTwoSamll == 'type') {
+          if (lisTwoSamll === '') {
+            if (lisTwoSamll === 'type') {
               console.log(relations[listTwo][lisTwoSamll])
-              if (relations[listTwo][lisTwoSamll] == '') {
+              if (relations[listTwo][lisTwoSamll] === '') {
               }
               //            if(relations[listTwo][lisTwoSamll]!=="{}"){
               //            console.log(relations[listTwo][lisTwoSamll])
@@ -122,8 +121,11 @@ export default {
 <style lang="scss">
 #canvas {
 	display: block;
-	width: 100%;
-	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
 }
 
 svg {

@@ -63,6 +63,18 @@ export default [
           import('pages/productinfo/productAnalyse').then(module =>
             resolve(module)
           )
+      },
+      {
+        path: '/product',
+        name: 'product',
+        component: resolve =>
+          import('pages/product').then(module => resolve(module))
+      },
+      {
+        path: '/manager',
+        name: 'manager',
+        component: resolve =>
+          import('pages/manager').then(module => resolve(module))
       }
     ]
   }

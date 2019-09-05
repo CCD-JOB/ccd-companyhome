@@ -7,7 +7,15 @@ export const getShowVenture = params => {
   })
 }
 
+export const getShowVentureCount = params => {
+  return axios({
+    url: '/infor/ventureSearch/showVentureCount',
+    params
+  })
+}
+
 // 默认全部倒出
 export default {
-  getShowVenture
+  getShowVenture,
+  getShowVentureCount
 }
