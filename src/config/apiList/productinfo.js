@@ -14,8 +14,16 @@ export const getAllIndustry = params => {
   })
 }
 
+export const getD3DataSource = params => {
+  return axios({
+    url: '/fund/neo4j/data/by_node',
+    params
+  })
+}
+
 // 默认全部倒出
 export default {
   getProductList,
-  getAllIndustry
+  getAllIndustry,
+  getD3DataSource
 }

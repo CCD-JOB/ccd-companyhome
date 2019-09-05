@@ -1,10 +1,11 @@
 <template lang="pug">
   el-dialog.home-modal.flex-c(
-  :visible.sync="isHomeModalVisible"
-  width="80%"
-  :before-close="close"
-  :show-close="false"
-   )
+    :visible.sync="isHomeModalVisible"
+    width="80%"
+    :before-close="close"
+    :show-close="false"
+    :append-to-body='true'
+  )
     slot
 </template>
 

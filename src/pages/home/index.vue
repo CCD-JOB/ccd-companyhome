@@ -35,11 +35,11 @@
         i.iconfont &#xe64d;
       el-divider
       ul.main-part-operate-list.clearfix
-        li(v-for="item in operateList" :key="item.src" @click="$router.push({ path: item.linkto, query: { id } })")
+        li(v-for="item in operateList" :key="item.src" @click="handleGoHomeInfo(item)")
           img(:src="item.src")
           p {{item.name}}
       .main-part-product-info
-        .main-part-product-info-title.flex-b(@click="goProductInfo")
+        .main-part-product-info-title.flex-b(@click="handleGoProductInfo")
           h3 产品信息
           p 总数 {{productListInfo.total}}
             i.iconfont &#xe64d;
@@ -51,7 +51,7 @@
           button(@click="$router.push('/productinfo/productanalyse')")
             i.iconfont &#xe618;
             span 产品分析
-          button(@click="$router.push('/productinfo/productatlas')")
+          button(@click="$router.push({path:'/productinfo/productatlas',query:{id}})")
             i.iconfont &#xe918;
             span 产品图谱
       warning-info(
@@ -61,28 +61,35 @@
         :listInfo="warningListInfo"
         :currentSelect="currentSelect"
       )
-    home-drawer(:isHomeDrawerVisible="isHomeDrawerVisible" @close="isHomeDrawerVisible=false")
-      .home-drawer-slot
-        .home-drawer-top
-          iv-badge(dot :count="1" :offset="[150, -15]")
-            el-avatar.top-part-avatar(:src="avatarUrl")
-          h3 华设资产管理（上海）有限公司
-        .home-drawer-bottom
-          div
-            i.iconfont &#xe657;
-            p 021-6162636
-          div
-            i.iconfont &#xe640;
-            p 上海市崇明区北沿公路2099号
-          div
-            i.iconfont &#xe935;
-            p https://www.hwasbank.com
-    home-modal(:isHomeModalVisible="isHomeModalVisible" @close="isHomeModalVisible=false")
-      ul.home-modal-slot
-        li(v-for="item in mainInfoList" :key="item.code")
-          i.iconfont &#xe710;
-            span {{item.code | maininfoTitleFilter}}
-          p {{item.content}}
+  home-drawer(:isHomeDrawerVisible="isHomeDrawerVisible" @close="isHomeDrawerVisible=false")
+    .home-drawer-slot
+      .home-drawer-top
+        iv-badge(dot :count="1" :offset="[150, -15]")
+          el-avatar.top-part-avatar(:src="avatarUrl")
+        h3 华设资产管理（上海）有限公司
+      .home-drawer-bottom
+        div
+          i.iconfont &#xe657;
+          p 021-6162636
+        div
+          i.iconfont &#xe640;
+          p 上海市崇明区北沿公路2099号
+        div
+          i.iconfont &#xe935;
+          p https://www.hwasbank.com
+  home-modal(:isHomeModalVisible="isHomeModalVisible" @close="isHomeModalVisible=false")
+    ul.home-modal-slot
+      li(v-for="item in mainInfoList" :key="item.code")
+        i.iconfont &#xe710;
+          span {{item.code | maininfoTitleFilter}}
+        p {{item.content}}
+  home-modal(title="提示" :isHomeModalVisible="isHomeAlertGoDialogVisible" @close="isHomeAlertGoDialogVisible=false")
+    .home-alert-go-download-slot
+      h2 请下载app进行体验
+      div
+        el-button(type="primary" @click="goDownload") 去下载
+  </span>
+
 </template>
 
 <script>
@@ -108,27 +115,32 @@ const operateList = [
   {
     name: '工商信息',
     src: require('./img/icon1.png'),
-    linkto: '/companyinfo/business'
+    linkto: '/companyinfo/business',
+    showmodal: true
   },
   {
     name: '私募管理人',
     src: require('./img/icon2.png'),
-    linkto: '/companyinfo/privateman'
+    linkto: '/companyinfo/privateman',
+    showmodal: true
   },
   {
     name: '风险信息',
     src: require('./img/icon3.png'),
-    linkto: '/companyinfo/risk'
+    linkto: '/companyinfo/risk',
+    showmodal: false
   },
   {
     name: '历史变更',
     src: require('./img/icon4.png'),
-    linkto: '/companyinfo/historical'
+    linkto: '/companyinfo/historical',
+    showmodal: true
   },
   {
     name: '对外投资',
     src: require('./img/icon5.png'),
-    linkto: '/companyinfo/investment'
+    linkto: '/companyinfo/investment',
+    showmodal: true
   }
 ]
 export default {
@@ -144,6 +156,7 @@ export default {
       avatarUrl: 'https://i.loli.net/2017/08/21/599a521472424.jpg',
       isHomeDrawerVisible: false,
       isHomeModalVisible: false,
+      isHomeAlertGoDialogVisible: false,
       // 公司详情相关
       operateList,
       // 异常机构相关
@@ -153,7 +166,6 @@ export default {
       productList: [],
       productListInfo: {},
       // 舆情相关
-      // 舆情按钮
       warningBtns,
       currentSelect: 0,
       queryParam: {
@@ -274,8 +286,19 @@ export default {
       this.getWarningListPart()
     },
     // 去到产品信息页
-    goProductInfo () {
+    handleGoProductInfo () {
       this.$router.push({ path: '/productinfo', query: { id: this.id } })
+    },
+    // 去到公司信息页
+    handleGoHomeInfo (item) {
+      if (item.showmodal) {
+        this.isHomeAlertGoDialogVisible = true
+      } else {
+        this.$router.push({ path: item.linkto, query: { id: this.id } })
+      }
+    },
+    goDownload () {
+      this.isHomeAlertGoDialogVisible = false
     },
     // 监听滚动
     scroll (pos) {
@@ -446,12 +469,29 @@ export default {
 		}
 	}
 }
+.home-alert-go-download-slot {
+	padding: 26px 48px 36px;
+	h2 {
+		font-size: 30px;
+		font-weight: bold;
+		text-align: center;
+	}
+	div {
+		text-align: center;
+		margin-top: 50px;
+		.el-button {
+			font-size: 30px;
+			padding: 20px 40px;
+		}
+	}
+}
 .home-wrapper {
 	position: fixed;
 	top: 0;
 	bottom: 0;
 	left: 0;
 	right: 0;
+	z-index: 1;
 	background: rgba(248, 248, 248, 1);
 	.main-part-warning-info-fixed-title {
 		width: 100%;
@@ -525,8 +565,6 @@ export default {
 		background: #fff;
 		border-radius: 20px 20px 0px 0px;
 		.main-part-icon-group {
-			/* position: relative;
-			z-index: 2; */
 			text-align: center;
 			margin-top: 15px;
 			padding: 0 36px;
@@ -586,7 +624,6 @@ export default {
 		}
 		.main-part-operate-list {
 			padding: 0 36px;
-
 			margin-top: 58px;
 			li {
 				float: left;

@@ -1,14 +1,14 @@
 <template lang="pug">
-  .list-wrapper(ref="wrapper")
-    .scroll-content
-      div(ref="listWrapper")
-        slot
-      slot(name="pullup" :pullUpLoadObj="pullUpLoadObj")
-        .pullup-wrapper(v-if="pullup")
-          .before-trigger(v-if="!isPullUpLoad")
-            span {{pullUpTxt}}
-          .after-trigger(v-else)
-            loading
+.list-wrapper(ref="wrapper")
+  .scroll-content
+    div(ref="listWrapper")
+      slot
+    slot(name="pullup" :pullUpLoadObj="pullUpLoadObj")
+      .pullup-wrapper(v-if="pullup")
+        .before-trigger(v-if="!isPullUpLoad")
+          span {{pullUpTxt}}
+        .after-trigger(v-else)
+          loading
 </template>
 
 <script>
@@ -182,8 +182,8 @@ export default {
 <style lang="scss" >
 .list-wrapper {
 	position: relative;
-	height: 100%;
 	overflow: hidden;
+	height: 100%;
 	.scroll-content {
 		position: relative;
 		z-index: 1;
