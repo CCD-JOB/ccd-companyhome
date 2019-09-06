@@ -4,7 +4,6 @@
       .tax-arrears-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.tax-arrears-info
         dt  欠税税种：
         dd {{item.taxArrears}}

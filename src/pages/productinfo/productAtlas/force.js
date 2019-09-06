@@ -3,7 +3,7 @@ import * as d3 from 'd3'
 export default function init (el, resp) {
   const width = 800
   const height = 600
-  const initScale = 0.3 // 初始化缩放倍数
+  const initScale = 0.5 // 初始化缩放倍数
   let draging = false
   const nodeConf = {
     fillColor: {
@@ -198,8 +198,8 @@ export default function init (el, resp) {
 
   function zoomFn () {
     const { translate, scale } = d3.event
-    /* console.log('x轴坐标',translate[0]);
-          console.log('scale', scale); */
+    console.log(translate)
+
     container.attr(
       'transform',
       'translate(' + translate + ')scale(' + scale * initScale + ')'

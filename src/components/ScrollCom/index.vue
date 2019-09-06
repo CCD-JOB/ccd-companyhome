@@ -164,16 +164,10 @@ export default {
     }
   },
   watch: {
-    data (val) {
-      if (!val.length) {
-        setTimeout(() => {
-          this.forceUpdate()
-        }, this.refreshDelay)
-      } else {
-        setTimeout(() => {
-          this.forceUpdate(true)
-        }, this.refreshDelay)
-      }
+    data () {
+      setTimeout(() => {
+        this.forceUpdate(true)
+      }, this.refreshDelay)
     }
   }
 }

@@ -4,7 +4,6 @@
       .administrative-sanction-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.administrative-sanction-info
         dt  决定书文号：
         dd  {{item.documentNumber}}

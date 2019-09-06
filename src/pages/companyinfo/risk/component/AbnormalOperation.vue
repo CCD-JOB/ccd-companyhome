@@ -4,7 +4,6 @@
       .abnormal-operation-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.abnormal-operation-info
         dt  列入经营异常名录原因：
         dd  {{item.inclusionReason}}

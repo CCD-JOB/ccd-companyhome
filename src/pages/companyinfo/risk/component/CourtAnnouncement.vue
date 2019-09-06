@@ -4,7 +4,6 @@
       .court-announcement-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.court-announcement-info
         dt  当事人：
         dd  {{item.defendant}}

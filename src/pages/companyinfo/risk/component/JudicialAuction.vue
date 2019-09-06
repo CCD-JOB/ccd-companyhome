@@ -4,7 +4,6 @@
       .judicial-auction-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
         p {{item.auctionNotice}}
       dl.judicial-auction-info
         .flex-b

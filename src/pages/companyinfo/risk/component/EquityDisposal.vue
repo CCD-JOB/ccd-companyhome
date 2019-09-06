@@ -4,7 +4,6 @@
       .equity-disposal-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.equity-disposal-info
         dt  出质人：
         dd {{item.pledgor}}

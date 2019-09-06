@@ -11,7 +11,7 @@
           p {{item.title}}
           span {{item.sourceForm}}
           span {{item.releaseDate}}
-        img(:src="item.coverPath")
+        img(:src="item.coverPath" v-if="item.coverPath")
 </template>
 
 <script>

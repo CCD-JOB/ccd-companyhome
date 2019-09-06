@@ -4,7 +4,6 @@
       .filing-information-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.filing-information-info
         dt  案由：
         dd  {{item.caseOfAction}}

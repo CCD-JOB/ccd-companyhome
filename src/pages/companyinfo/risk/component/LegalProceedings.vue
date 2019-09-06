@@ -4,7 +4,6 @@
       .legal-proceedings-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
         p {{item.caseName}}
       dl.legal-proceedings-info
         dt  案号:
@@ -15,8 +14,7 @@
         dd  {{item.publishedDate}}
         dt  案件身份：
         dd.special
-          p 原告：{{item.caseIdentity}}
-          p 被告：{{item.companyName}}
+          p {{item.caseIdentity}}
       .legal-proceedings-divider
 </template>
 

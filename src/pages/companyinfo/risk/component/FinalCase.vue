@@ -4,7 +4,6 @@
       .final-case-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.final-case-info
         dt  执行法院：
         dd {{item.court}}

@@ -16,8 +16,8 @@
       .risk-info-title.flex-b
         h3 {{siderMenuList[current].name}}
           span(v-if="siderMenuList[current].num !== 0") {{siderMenuList[current].num}}
-        p(v-if="!dropdownList.length") 全部
-          i.iconfont &#xe622;
+        //- p(v-if="!dropdownList.length") 全部
+        //-   i.iconfont &#xe622;
         el-dropdown(v-if="dropdownList.length" trigger="click").risk-info-title-sp
           span.el-dropdown-link {{dropdownList[0].name}}
             i.iconfont &#xe622;
@@ -97,12 +97,12 @@ export default {
         {
           id: 'announcement',
           name: '开庭公告',
-          num: 1069
+          num: ''
         },
         {
           id: 'lawsuit',
           name: '法律诉讼',
-          num: 101
+          num: ''
         },
         {
           id: 'court',
@@ -184,10 +184,8 @@ export default {
     }
   },
   created () {
-    // this.queryParam.companyId = this.$route.query.id
-    this.queryParam.companyId = 1710
+    this.queryParam.companyId = this.$route.query.id
     this.getDataInfo()
-    this.getDataList()
   },
   methods: {
     resetParam () {
@@ -209,6 +207,10 @@ export default {
             }
           }
         })
+        this.current = this.siderMenuList.findIndex(item => {
+          return item.num > 0
+        })
+        this.getDataList()
       } catch (error) {
         console.log(error)
       }
@@ -222,6 +224,11 @@ export default {
           })
         this.list = this.list.concat(result.data.list)
         this.listInfo.totalPages = result.data.pages
+        if (this.queryParam.startPage >= result.data.pages) {
+          setTimeout(() => {
+            this.$refs.scrollCom.forceUpdate()
+          }, 200)
+        }
       } catch (error) {
         console.log(error)
       }
@@ -256,18 +263,6 @@ export default {
       this.queryParam.discriminate = item.id
       this.resetParam()
       this.getDataList()
-    }
-  },
-  filters: {
-    navlistFilter: val => {
-      let str = ''
-      if (!val) return str
-      switch (val) {
-        case 'announcement':
-          str = '开庭公告'
-          break
-      }
-      return val
     }
   }
 }

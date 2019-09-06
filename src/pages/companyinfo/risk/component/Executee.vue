@@ -4,12 +4,13 @@
       .executee-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.executee-info
         dt  案号：
         dd {{item.caseNumber}}
         dt  执行法院：
         dd  {{item.court}}
+        dt  执行标的：
+        dd  {{item.executionObject}}
         dt  立案日期：
         dd  {{item.filingDate}}
       .executee-divider

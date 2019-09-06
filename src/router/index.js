@@ -5,8 +5,9 @@ import routes from 'config/routes.config.js'
 Vue.use(Router)
 
 export default () => {
+  const isDev = process.env.NODE_ENV === 'development'
   return new Router({
-    // mode: 'history',
+    mode: isDev ? 'history' : 'hash',
     routes
   })
 }

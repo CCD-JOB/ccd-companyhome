@@ -4,7 +4,6 @@
       .judicial-assistance-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.judicial-assistance-info
         dt  被执行人：
         dd {{item.executee}}

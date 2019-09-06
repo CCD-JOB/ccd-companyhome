@@ -4,8 +4,7 @@
       .opening-notice-title.flex-b
         .flex-s
           em {{String(index+1).padStart(2, '0')}}
-          span 合同协议纠纷
-        i.iconfont &#xe64d;
+          span {{item.caseOfAction}}
       dl.opening-notice-info
         dt  案号:
         dd  {{item.caseNumber}}
@@ -14,7 +13,7 @@
         dt  被告/被上诉人：
         dd  {{item.accused}}
         dt  开庭时间：
-        dd  {{item.courtDate}}
+        dd  {{item.courtDate.split(' ')[0]}}
       .opening-notice-divider
 </template>
 

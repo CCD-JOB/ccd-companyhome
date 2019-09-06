@@ -153,7 +153,7 @@ export default {
   },
   data () {
     return {
-      id: 1547451652420,
+      id: '',
       avatarUrl: 'https://i.loli.net/2017/08/21/599a521472424.jpg',
       isHomeDrawerVisible: false,
       isHomeModalVisible: false,
@@ -183,6 +183,8 @@ export default {
   created () {
     this.probeType = 3
     this.listenScroll = true
+    this.id = this.$route.query.id
+    // this.id = 7010
     this.getProductList()
     this.getMainInfoList()
     this.getWarningListPart()

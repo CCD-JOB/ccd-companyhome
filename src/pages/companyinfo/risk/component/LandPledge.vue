@@ -4,7 +4,6 @@
       .land-pledge-title
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
-          i.iconfont &#xe64d;
       dl.land-pledge-info
         dt  土地坐落：
         dd {{item.address}}
