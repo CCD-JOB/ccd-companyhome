@@ -14,45 +14,47 @@
     @scroll="scroll"
   )
     .top-part
-      iv-badge.top-part-iv-badge(dot :count="1" )
-        el-avatar.top-part-avatar(:src="avatarUrl")
+      el-badge.top-part-iv-badge(is-dot :count="1" )
+        el-avatar.top-part-avatar(:shape="'circle'") {{avatarName}}
       button.top-part-btn
         span 私募
     .main-part
       .main-part-icon-group
-        i.iconfont(@click="isHomeDrawerVisible=true") &#xe935;
-        i.iconfont(@click="isHomeDrawerVisible=true") &#xe640;
-        i.iconfont(@click="isHomeDrawerVisible=true") &#xe657;
-        i.iconfont &#xe60f;
+        i.iconfont(@click="tmpShowAlert") &#xe935;
+        i.iconfont(@click="tmpShowAlert") &#xe640;
+        i.iconfont(@click="tmpShowAlert") &#xe657;
+        i.iconfont(@click="tmpShowAlert") &#xe60f;
       .main-part-title.clearfix
-        h2 华设资产管理（上海）有限公司
+        h2 {{homeInfo.fullName}}
         div 法定代表人:
-          span 上官施乐
+          span {{homeInfo.name}}
         div 注册资本:
-          span 2000w
-      el-divider
-      div.main-part-info(@click="isHomeModalVisible = mainInfoListInfo.flag") 异常机构
-        span 未按要求进行产品更新或着其他原因呵呵呵呵呵
-        i.iconfont &#xe64d;
-      el-divider
+          span {{homeInfo.registeredCapital}}
+      div(v-if="mainInfoList.length")
+        el-divider
+        div.main-part-info(@click="tmpShowAlert") {{mainInfoFirst.code | maininfoTitleFilter}}
+          span {{mainInfoFirst.content}}
+          i.iconfont &#xe64d;
+        el-divider
       ul.main-part-operate-list.clearfix
         li(v-for="item in operateList" :key="item.src" @click="handleGoHomeInfo(item)")
           img(:src="item.src")
           p {{item.name}}
       .main-part-product-info
-        .main-part-product-info-title.flex-b(@click="handleGoProductInfo")
+        .main-part-product-info-title.flex-b(@click="tmpShowAlert")
           h3 产品信息
           p 总数 {{productListInfo.total}}
             i.iconfont &#xe64d;
         ul.main-part-product-info-list
           li.flex-b(v-for="item in productList" :key="item.id" )
-            iv-badge(:status="item.fundState | fundStateBadgeFilter" :text="item.fullName")
+            em(:style="item.fundState | fundStateBadgeFilter")
+            span.text {{item.fullName}}
             span.status {{item.fundState | fundStateFilter}}
         .main-part-product-info-btn
-          button(@click="$router.push('/productinfo/productanalyse')")
+          button(@click="tmpShowAlert")
             i.iconfont &#xe618;
             span 产品分析
-          button(@click="$router.push({path:'/productinfo/productatlas',query:{id}})")
+          button(@click="handleGoProductAtlas")
             i.iconfont &#xe918;
             span 产品图谱
       warning-info(
@@ -65,9 +67,9 @@
   home-drawer(:isHomeDrawerVisible="isHomeDrawerVisible" @close="isHomeDrawerVisible=false")
     .home-drawer-slot
       .home-drawer-top
-        iv-badge(dot :count="1" :offset="[150, -15]")
-          el-avatar.top-part-avatar(:src="avatarUrl")
-        h3 华设资产管理（上海）有限公司
+        el-badge(is-dot)
+          el-avatar.top-part-avatar(:shape="'circle'") {{avatarName}}
+        h3 {{homeInfo.fullName}}
       .home-drawer-bottom
         div
           i.iconfont &#xe657;
@@ -97,7 +99,7 @@
 import ScrollCom from 'components/ScrollCom'
 import HomeDrawer from 'components/HomeDrawer'
 import HomeModal from 'components/HomeModal'
-import WarningInfo from './WarningInfo'
+import WarningInfo from 'components/WarningInfo'
 const warningBtns = [
   {
     id: 1,
@@ -154,10 +156,10 @@ export default {
   data () {
     return {
       id: '',
-      avatarUrl: 'https://i.loli.net/2017/08/21/599a521472424.jpg',
       isHomeDrawerVisible: false,
       isHomeModalVisible: false,
       isHomeAlertGoDialogVisible: false,
+      homeInfo: {},
       // 公司详情相关
       operateList,
       // 异常机构相关
@@ -184,12 +186,49 @@ export default {
     this.probeType = 3
     this.listenScroll = true
     this.id = this.$route.query.id
-    // this.id = 7010
+    // this.id = 1547451658666
+    this.getBasicInfo()
     this.getProductList()
     this.getMainInfoList()
     this.getWarningListPart()
   },
+  computed: {
+    avatarName () {
+      if (this.homeInfo && this.homeInfo.fullName) {
+        return this.homeInfo && this.homeInfo.fullName.slice(0, 1)
+      } else {
+        return ''
+      }
+    },
+    mainInfoFirst () {
+      if (this.mainInfoList.length) {
+        return {
+          code: this.mainInfoList[0].code,
+          content: this.mainInfoList[0].content
+        }
+      } else {
+        return {
+          name: '',
+          content: ''
+        }
+      }
+    }
+  },
   methods: {
+    // 获取基本信息
+    async getBasicInfo () {
+      try {
+        let param = {
+          administratorId: this.id
+        }
+        let result = await this.$api.home.getHomeInfo(param).then(res => {
+          return JSON.parse(res)
+        })
+        this.homeInfo = result.data
+      } catch (error) {
+        console.log(error)
+      }
+    },
     // 展示产品信息
     async getProductList () {
       try {
@@ -240,7 +279,7 @@ export default {
         console.log(error)
       }
     },
-    // 获取舆情信息
+    // 舆情 - 获取舆情信息
     async getWarningListPart () {
       try {
         this.queryParam.type = this.currentSelect + 1
@@ -258,10 +297,16 @@ export default {
         }
         this.warningList = [...this.warningList].concat(result.data.list)
         this.warningListInfo.totalPages = result.data.pages
+        if (this.queryParam.startPage >= result.data.pages) {
+          setTimeout(() => {
+            this.$refs.scrollCom.forceUpdate()
+          }, 200)
+        }
       } catch (error) {
         console.log(error)
       }
     },
+    // 舆情 - 重置舆情信息参数
     resetWarningListParam () {
       this.warningList = []
       this.warningListInfo = {
@@ -274,7 +319,7 @@ export default {
         administratorId: this.id
       }
     },
-    // 加载更多
+    // 舆情 - 加载更多
     handleLoadMore () {
       if (this.queryParam.startPage >= this.warningListInfo.totalPages) {
         this.$refs.scrollCom.forceUpdate()
@@ -283,6 +328,7 @@ export default {
       this.queryParam.startPage++
       this.getWarningListPart()
     },
+    // 舆情 - 切换舆情类型
     handleChangeBtn (index) {
       this.currentSelect = index
       this.resetWarningListParam()
@@ -290,8 +336,7 @@ export default {
     },
     // 去到产品信息页
     handleGoProductInfo () {
-      this.isHomeAlertGoDialogVisible = true
-      // this.$router.push({ path: '/productinfo', query: { id: this.id } })
+      this.$router.push({ path: '/productinfo', query: { id: this.id } })
     },
     // 去到公司信息页
     handleGoHomeInfo (item) {
@@ -301,6 +346,26 @@ export default {
         this.$router.push({ path: item.linkto, query: { id: this.id } })
       }
     },
+    // 展示异常机构弹框
+    handleGoMainPartInfo () {
+      this.isHomeModalVisible = this.mainInfoListInfo.flag
+    },
+    // 去到产品分析页面
+    handleGoProductAnalyse () {
+      this.$router.push('/productinfo/productanalyse')
+    },
+    // 去到产品图谱页面
+    handleGoProductAtlas () {
+      this.$router.push({
+        path: '/productinfo/productatlas',
+        query: { id: this.id }
+      })
+    },
+    // 监听滚动
+    scroll (pos) {
+      this.scrollY = pos.y
+    },
+    // 跳转下载页
     goDownload () {
       this.isHomeAlertGoDialogVisible = false
       if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
@@ -312,9 +377,9 @@ export default {
 					'https://sj.qq.com/myapp/detail.htm?apkName=com.lf.ccdapp'
       }
     },
-    // 监听滚动
-    scroll (pos) {
-      this.scrollY = pos.y
+    // 临时提示下载
+    tmpShowAlert () {
+      this.isHomeAlertGoDialogVisible = true
     }
   },
   filters: {
@@ -379,22 +444,22 @@ export default {
       if (!val) return str
       switch (val) {
         case 300:
-          str = 'success'
+          str = 'border-color:#00ff80'
           break
         case 301:
-          str = 'default'
+          str = 'border-color:#ff80c0'
           break
         case 302:
-          str = 'processing'
+          str = 'border-color:#ff8000'
           break
         case 303:
-          str = 'error'
+          str = 'border-color:green'
           break
         case 304:
-          str = 'warning'
+          str = 'border-color:#8000ff'
           break
         case 305:
-          str = 'error'
+          str = 'border-color:#b004040'
           break
       }
       return str
@@ -418,15 +483,18 @@ export default {
 	.home-drawer-top {
 		margin-top: 100px;
 		text-align: center;
-		.ivu-badge {
+		.el-badge {
 			.top-part-avatar {
 				width: 144px;
 				height: 144px;
-				border-radius: 50%;
+				line-height: 144px;
+				font-size: 50px;
 			}
-			.ivu-badge-dot {
-				width: 30px;
-				height: 30px;
+			.el-badge__content {
+				width: 20px;
+				height: 20px;
+				margin-top: 120px;
+				margin-right: 20px;
 			}
 		}
 		h3 {
@@ -544,23 +612,23 @@ export default {
 		}
 	}
 	.top-part {
-		padding: 0 36px;
+		padding: 10px 36px;
 		display: flex;
 		justify-content: space-between;
-		align-items: top;
 		position: relative;
 		z-index: 1;
 		.top-part-iv-badge {
 			.top-part-avatar {
 				width: 144px;
 				height: 144px;
-				border-radius: 50%;
+				line-height: 144px;
+				font-size: 50px;
 			}
-			.ivu-badge-dot {
-				width: 30px;
-				height: 30px;
+			.el-badge__content {
+				width: 20px;
+				height: 20px;
 				margin-top: 120px;
-				margin-left: -10px;
+				margin-right: 20px;
 			}
 		}
 		.top-part-btn {
@@ -576,7 +644,7 @@ export default {
 		}
 	}
 	.main-part {
-		margin-top: -72px;
+		margin-top: -92px;
 		height: 100%;
 		background: #fff;
 		border-radius: 20px 20px 0px 0px;
@@ -584,6 +652,8 @@ export default {
 			text-align: center;
 			margin-top: 15px;
 			padding: 0 36px;
+			position: relative;
+			z-index: 2;
 			i {
 				font-size: 40px;
 				margin: 0 18px;
@@ -683,15 +753,21 @@ export default {
 			.main-part-product-info-list {
 				margin-top: 40px;
 				li {
-					.ivu-badge-status-dot {
-						width: 16px;
-						height: 16px;
+					em {
+						width: 10px;
+						height: 10px;
+						border-radius: 50%;
+						border: 5px solid;
 					}
-					.ivu-badge-status-text {
+					.text {
 						font-size: 28px;
 						line-height: 48px;
-						margin-left: 10px;
 						color: #666666;
+						width: 500px;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+						word-break: break-all;
 					}
 					.status {
 						color: #999;

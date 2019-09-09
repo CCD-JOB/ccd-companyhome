@@ -1,6 +1,6 @@
 import axios from 'utils/http/api'
 
-export const getManagermessage = params => {
+export const getManagermessageInfo = params => {
   return axios({
     url: '/fund/getSeniorExecutive',
     params
@@ -8,6 +8,5 @@ export const getManagermessage = params => {
 }
 
 export default {
-  getManagermessage
-
+  getManagermessageInfo
 }

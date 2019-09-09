@@ -4,7 +4,7 @@
       li.flex-b(v-for="item in mainmemberList" :key="item.id")
         .flex-s
           .left.flex-c
-            iv-badge(dot :count="1" :offset="[105, 0]")
+            el-badge(is-dot)
               img(:src="item.avatar")
           .right
             h3 {{item.name}}
@@ -43,8 +43,8 @@ export default {
 			padding: 0 30px;
 			.left {
 				height: 180px;
-				.ivu-badge {
-					.ivu-badge-dot {
+				.el-badge {
+					.el-badge__content {
 						width: 22px;
 						height: 22px;
 					}

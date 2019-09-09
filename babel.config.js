@@ -1,19 +1,12 @@
 module.exports = {
-  presets: ['@vue/app'],
-  plugins: [
+  presets: [
     [
-      'import',
+      '@vue/app',
       {
-        libraryName: 'iview',
-        libraryDirectory: 'src/components'
+        useBuiltIns: 'entry',
+        polyfills: ['es6.promise', 'es6.symbol']
       }
     ]
-    // [
-    //   'component',
-    //   {
-    //     libraryName: 'element-ui',
-    //     styleLibraryName: 'theme-chalk'
-    //   }
-    // ]
-  ]
+  ],
+  plugins: []
 }

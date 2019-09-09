@@ -4,7 +4,9 @@ const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = {
   publicPath: isDev ? '/' : './',
+  transpileDependencies: ['webpack-dev-server/client'],
   chainWebpack: config => {
+    config.entry.app = ['babel-polyfill', './src/main.js']
     config.resolve.alias
       .set('@$', resolve('src'))
       .set('assets', resolve('src/assets'))
@@ -36,9 +38,7 @@ module.exports = {
       ]
     }
   },
-  devServer: {
-    
-  }
+  devServer: {}
 }
 
 function resolve (dir) {

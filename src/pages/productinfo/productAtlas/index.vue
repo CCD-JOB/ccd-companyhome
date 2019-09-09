@@ -18,7 +18,7 @@ export default {
     async getDataSource () {
       let param = {
         id: this.$route.query.id,
-        nodeType: 3
+        nodeType: this.$route.query.nodeType
       }
 
       let res = await this.$api.productinfo.getD3DataSource(param)
