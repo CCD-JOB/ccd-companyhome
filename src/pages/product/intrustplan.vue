@@ -1,5 +1,5 @@
 <template lang="pug">
-.product-wrapper
+.intrustplan-wrapper
   .main-part-warning-info-fixed-title(ref="titleFixed")
     h3 舆情信息
     ul.main-part-warning-info-btn.flex-s
@@ -15,7 +15,7 @@
   )
     .top-part
       el-badge.top-part-iv-badge(is-dot)
-        h3 {{productInfo.fullName}}
+        h3 {{productInfo.productName}}
       .top-part-btns
         el-button(type="primary") {{productInfo.type}}
     .main-part
@@ -34,12 +34,30 @@
                     el-button(round) 产品
                   p {{item.value}}
       .main-part-job.flex-s(@click="isHomeAlertGoDialogVisible=true")
-        h3 备案信息
+        h3 公示信息
         .flex-e
           div
-            p {{productInfo.latestUpdateTime}}
-            p 最后更新时间
-          i.iconfont &#xe64d;
+            p {{productInfo.productCode}}
+            p 产品编码
+      .main-part-productinfo
+        .flex-s
+          div
+            p 首次申请登记日期
+            p {{productInfo.firstApplicationRegistion}}
+          div
+            p 存续期限（月）
+            p {{productInfo.duration}}
+        .flex-s
+          div
+            p 主要投向行业
+            p {{productInfo.inverstIndustry}}
+          div
+            p 公示日期
+            p {{productInfo.publicityDate}}
+        .flex-s
+          div
+            p 财产运用方式
+            p {{productInfo.firstApplicationRegistion}}
       .main-part-basic
         h3 基本信息
         .basic.flex-b
@@ -141,7 +159,7 @@ export default {
       try {
         let param = {
           productId: 1547452014555,
-          type: 1
+          type: 2
         }
         let result = await this.$api.product.getProductBasicInfo(param)
         this.productInfo = JSON.parse(result).data
@@ -263,7 +281,7 @@ export default {
 		}
 	}
 }
-.product-wrapper {
+.intrustplan-wrapper {
 	position: fixed;
 	top: 0;
 	bottom: 0;
@@ -445,6 +463,32 @@ export default {
 				vertical-align: bottom;
 				color: #666;
 				padding-left: 180px;
+			}
+		}
+		.main-part-productinfo {
+			margin: 36px 36px 0;
+			padding: 40px 36px;
+			border: 2px solid rgba(238, 238, 238, 1);
+			border-radius: 40px;
+			.flex-s {
+				margin-top: 20px;
+				&:nth-of-type(1) {
+					margin-top: 0;
+				}
+				div:nth-child(odd) {
+					width: 364px;
+				}
+			}
+			p:nth-child(odd) {
+				font-size: 24px;
+				line-height: 50px;
+				color: #999;
+			}
+			p:nth-child(even) {
+				font-size: 28px;
+				line-height: 50px;
+				font-weight: 500;
+				color: #555;
 			}
 		}
 		.main-part-basic {

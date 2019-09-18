@@ -92,7 +92,6 @@
       div
         el-button(type="primary" @click="goDownload") 去下载
   </span>
-
 </template>
 
 <script>

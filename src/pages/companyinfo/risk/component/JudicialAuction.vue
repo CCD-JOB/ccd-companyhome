@@ -5,16 +5,17 @@
         .flex-b
           em {{String(index+1).padStart(2, '0')}}
         p {{item.auctionNotice}}
-      dl.judicial-auction-info
+      .judicial-auction-info
         .flex-b
-          div
-            dt  评估价：
-            dd(style="width:217px;") {{item.auctionTarget | startFilter}}
-          div
-            dt  起拍价：
-            dd(style="width:217px;")  {{item.auctionTarget | judgeFilter}}
-        dt  公告时间：
-        dd  {{item.publicationDate}}
+          div(style="width:217px")
+            span  评估价：
+            span(style="width:100%") {{item.auctionTarget | startFilter}}
+          div(style="width:217px")
+            span  起拍价：
+            span(style="width:100%")  {{item.auctionTarget | judgeFilter}}
+        div
+          span  公告时间：
+          span(style="width:462px")  {{item.publicationDate}}
       .judicial-auction-divider
 </template>
 
@@ -76,21 +77,22 @@ export default {
 		}
 		.judicial-auction-info {
 			padding: 10px 20px 60px 38px;
-			dt {
+			span:nth-of-type(odd) {
 				font-size: 26px;
 				line-height: 56px;
 				font-weight: 500;
 				color: #333;
+				display: inline-block;
 			}
-			dd {
+			span:nth-of-type(even) {
 				font-size: 24px;
 				line-height: 56px;
 				font-weight: 500;
 				padding: 0 22px;
-				width: 462px;
 				box-sizing: border-box;
 				background: #f8f8f8;
 				color: #999999;
+				display: inline-block;
 			}
 		}
 		.judicial-auction-divider {

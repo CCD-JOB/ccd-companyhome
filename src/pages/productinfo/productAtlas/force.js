@@ -1,6 +1,6 @@
+/* eslint-disable */
 import * as d3 from 'd3'
-
-export default function init (el, resp) {
+export default function init(el, resp) {
   const width = 800
   const height = 600
   const initScale = 0.5 // 初始化缩放倍数
@@ -8,7 +8,7 @@ export default function init (el, resp) {
   const nodeConf = {
     fillColor: {
       基金: 'rgb(255, 76, 10)',
-      信托: '#449d44',
+      信托: 'rgb(158,234,106)',
       管理人: 'rgb(35, 148, 206)',
       基金经理: 'rgb(255,215,0)',
       托管人: 'rgb(255,162,208)',
@@ -16,6 +16,7 @@ export default function init (el, resp) {
     },
     strokeColor: {
       基金: 'rgb(244,56,0)',
+      信托: 'rgb(158,234,106)',
       管理人: 'rgb(35, 148, 206)',
       基金经理: 'rgb(255,215,0)',
       托管人: 'rgb(255,162,208)',
@@ -23,6 +24,7 @@ export default function init (el, resp) {
     },
     strokeWidth: {
       基金: 3,
+      信托: 3,
       管理人: 3,
       基金经理: 3,
       托管人: 3,
@@ -30,6 +32,7 @@ export default function init (el, resp) {
     },
     textFillColor: {
       基金: '#fff',
+      信托: '#fff',
       管理人: '#fff',
       基金经理: '#fff',
       托管人: '#fff',
@@ -37,6 +40,7 @@ export default function init (el, resp) {
     },
     radius: {
       基金: 120,
+      信托: 120,
       管理人: 120,
       基金经理: 120,
       托管人: 120,
@@ -100,19 +104,19 @@ export default function init (el, resp) {
   const container = svg
     .append('g')
     // .attr('transform', 'scale(' + initScale + ')')
-    .attr('transform', 'translate(100,200)scale(' + initScale + ')')
+    .attr('transform', 'translate(200,300)scale(' + initScale + ')')
     .attr('class', 'container')
 
   // 请求数据，绘制图表
   // 初始化
-  setTimeout(function () {
+  setTimeout(function() {
     initialize(resp)
   }, 10)
 
-  function genLinks (relations) {
+  function genLinks(relations) {
     const indexHash = {}
 
-    return relations.map(function ({ id, startNode, endNode, type }, i) {
+    return relations.map(function({ id, startNode, endNode, type }, i) {
       const linkKey = startNode + '-' + endNode
       const count = linkMap[linkKey]
       if (indexHash[linkKey]) {
@@ -134,9 +138,9 @@ export default function init (el, resp) {
     })
   }
 
-  function genLinkMap (relations) {
+  function genLinkMap(relations) {
     const hash = {}
-    relations.map(function ({ startNode, endNode, type }) {
+    relations.map(function({ startNode, endNode, type }) {
       const key = startNode + '-' + endNode
       if (hash[key]) {
         hash[key] += 1
@@ -149,9 +153,9 @@ export default function init (el, resp) {
     return hash
   }
 
-  function genNodesMap (nodes) {
+  function genNodesMap(nodes) {
     const hash = {}
-    nodes.map(function ({ id, properties, labels }) {
+    nodes.map(function({ id, properties, labels }) {
       hash[id] = {
         id,
         properties,
@@ -162,7 +166,7 @@ export default function init (el, resp) {
   }
 
   // 生成关系连线路径
-  function genLinkPath (link) {
+  function genLinkPath(link) {
     const sr = nodeConf.radius.Person
     const tr = nodeConf.radius.Movie
 
@@ -177,7 +181,7 @@ export default function init (el, resp) {
     return 'M' + sx + ',' + sy + ' L' + tx + ',' + ty
   }
 
-  function getLineAngle (sx, sy, tx, ty) {
+  function getLineAngle(sx, sy, tx, ty) {
     // 两点 x, y 坐标偏移值
     const x = tx - sx
     const y = ty - sy
@@ -196,54 +200,58 @@ export default function init (el, resp) {
     return angle
   }
 
-  function zoomFn () {
+  function zoomFn() {
     const { translate, scale } = d3.event
-    console.log(translate)
 
     container.attr(
       'transform',
       'translate(' + translate + ')scale(' + scale * initScale + ')'
     )
-    /* if (Number(translate[0]) < 800 && Number(translate[0]) > -100) {
-              container.attr('transform', 'translate(' + translate + ')scale(' + scale * initScale + ')');
-          }else{
-              console.log('走了else')
-              //container.attr('transform', 'translate(0)scale(0.25)');
-              var draged = d3.behavior.drag();
-              draged.on("dragstart", function () {
-                  d3.event.sourceEvent.stopPropagation();
-              }).on("dragend", function () {
-                  d3.event.sourceEvent.stopPropagation();
-              });
-          } */
+    // if (Number(translate[0]) < 800 && Number(translate[0]) > -100) {
+    //   container.attr(
+    //     'transform',
+    //     'translate(' + translate + ')scale(' + scale * initScale + ')'
+    //   )
+    // } else {
+    //   console.log('走了else')
+    //   //container.attr('transform', 'translate(0)scale(0.25)');
+    //   var draged = d3.behavior.drag()
+    //   draged
+    //     .on('dragstart', function() {
+    //       d3.event.sourceEvent.stopPropagation()
+    //     })
+    //     .on('dragend', function() {
+    //       d3.event.sourceEvent.stopPropagation()
+    //     })
+    // }
   }
 
-  function dragstartFn (d) {
-    // console.log('dragstartFn', d);
+  function dragstartFn(d) {
+    // console.log('dragstartFn', d)
     draging = true
     d3.event.sourceEvent.stopPropagation()
     force.start()
   }
 
-  function dragFn (d) {
-    // console.log('dragFn',d3.event.x)
+  function dragFn(d) {
+    // console.log('dragFn', d3.event.x)
     draging = true
     d3.select(this)
       .attr('cx', (d.x = d3.event.x))
       .attr('cy', (d.y = d3.event.y))
   }
 
-  function dragendFn (d) {
+  function dragendFn(d) {
     // console.log('dragendFn', d);
     draging = false
     force.stop()
   }
 
-  function isLinkLine (node, link) {
+  function isLinkLine(node, link) {
     return link.source.id == node.id || link.target.id == node.id
   }
 
-  function isLinkNode (currNode, node) {
+  function isLinkNode(currNode, node) {
     if (currNode.id === node.id) {
       return true
     }
@@ -253,7 +261,7 @@ export default function init (el, resp) {
     )
   }
 
-  function textBreaking (d3text, text) {
+  function textBreaking(d3text, text) {
     const len = text.length
     if (len <= 13) {
       d3text
@@ -262,9 +270,14 @@ export default function init (el, resp) {
         .attr('y', 8)
         .text(text)
     } else {
-      const topText = text.substring(0, 8)
-      const midText = text.substring(8, 16)
-      let botText = text.substring(16, len)
+      let topText = ''
+      let midText = ''
+      let botText = ''
+      if (text.name !== '') {
+        topText = text.substring(0, 8)
+        midText = text.substring(8, 16)
+        botText = text.substring(16, len)
+      }
       let topY = -30
       let midY = 18
       let botY = 4
@@ -276,7 +289,9 @@ export default function init (el, resp) {
         topY += 10
         midY += 1
         botY += 45
-        botText = text.substring(18, 28) + '...'
+        if (text.name !== '') {
+          botText = text.substring(18, 28) + '...'
+        }
       }
 
       d3text.text('')
@@ -284,27 +299,27 @@ export default function init (el, resp) {
         .append('tspan')
         .attr('x', 0)
         .attr('y', topY)
-        .text(function () {
+        .text(function() {
           return topText
         })
       d3text
         .append('tspan')
         .attr('x', 0)
         .attr('y', midY)
-        .text(function () {
+        .text(function() {
           return midText
         })
       d3text
         .append('tspan')
         .attr('x', 0)
         .attr('y', botY)
-        .text(function () {
+        .text(function() {
           return botText
         })
     }
   }
 
-  function getLineTextDx (d) {
+  function getLineTextDx(d) {
     const sr = nodeConf.radius[d.source.labels]
     const sx = d.source.x
     const sy = d.source.y
@@ -321,7 +336,7 @@ export default function init (el, resp) {
     return dx
   }
 
-  function getLineTextAngle (d, bbox) {
+  function getLineTextAngle(d, bbox) {
     if (d.target.x < d.source.x) {
       const { x, y, width, height } = bbox
       const rx = x + width / 2
@@ -332,7 +347,7 @@ export default function init (el, resp) {
     }
   }
 
-  function toggleNode (nodeCircle, currNode, isHover) {
+  function toggleNode(nodeCircle, currNode, isHover) {
     console.log('toggleNode', nodeCircle, currNode, isHover)
     if (isHover) {
       // 提升节点层级
@@ -347,7 +362,7 @@ export default function init (el, resp) {
     }
   }
 
-  function toggleLine (linkLine, currNode, isHover) {
+  function toggleLine(linkLine, currNode, isHover) {
     if (isHover) {
       // 加重连线样式
       linkLine
@@ -361,7 +376,7 @@ export default function init (el, resp) {
     }
   }
 
-  function toggleLineText (lineText, currNode, isHover) {
+  function toggleLineText(lineText, currNode, isHover) {
     if (isHover) {
       // 只显示相连连线文字
       lineText.style('fill-opacity', link =>
@@ -373,7 +388,7 @@ export default function init (el, resp) {
     }
   }
 
-  function toggleMarker (marker, currNode, isHover) {
+  function toggleMarker(marker, currNode, isHover) {
     if (isHover) {
       // 放大箭头
       marker
@@ -385,13 +400,13 @@ export default function init (el, resp) {
     }
   }
 
-  function round (num, pow = 2) {
+  function round(num, pow = 2) {
     const multiple = Math.pow(10, pow)
     return Math.round(num * multiple) / multiple
   }
 
   // 初始化
-  function initialize (resp) {
+  function initialize(resp) {
     let { nodes, relations } = resp
 
     const nodesLength = nodes.length
@@ -521,7 +536,7 @@ export default function init (el, resp) {
           }) */
 
     // 鼠标交互
-    nodeCircle.on('click', function (currNode) {
+    nodeCircle.on('click', function(currNode) {
       if (draging) {
         return
       }
@@ -567,12 +582,12 @@ export default function init (el, resp) {
       .style('fill', ({ labels }) => nodeConf.textFillColor[labels])
       .attr('text-anchor', 'middle')
       .attr('dy', '0em')
-      .attr('x', function ({ properties }) {
+      .attr('x', function({ properties }) {
         return textBreaking(d3.select(this), properties)
       })
 
     // 更新力导向图
-    function tick () {
+    function tick() {
       // 节点位置
       nodeCircle.attr(
         'transform',
@@ -583,7 +598,7 @@ export default function init (el, resp) {
       // 连线文字位置
       lineText.attr('dx', link => getLineTextDx(link))
       // 连线文字角度
-      lineText.attr('transform', function (link) {
+      lineText.attr('transform', function(link) {
         return getLineTextAngle(link, this.getBBox())
       })
     }
@@ -591,7 +606,7 @@ export default function init (el, resp) {
     // 更新力导向图
     // 注意1：必须调用一次 tick （否则，节点会堆积在左上角）
     // 注意2：调用位置必须在 nodeCircle, nodeText, linkLine, lineText 后
-    setTimeout(function () {
+    setTimeout(function() {
       tick()
     }, 10)
 

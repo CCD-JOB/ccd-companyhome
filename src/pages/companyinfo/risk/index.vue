@@ -7,7 +7,7 @@
           li(
             v-for="(item,index) in siderMenuList"
             :key="item.id"
-            :class="[{active: current===index },{noInfo: item.num === 0}]"
+            :class="[{active: current===index },{noInfo: !item.num||item.num === 0}]"
             @click="item.num !== 0?switchCom(index):''"
           )
             span {{item.name}}
@@ -185,6 +185,7 @@ export default {
   },
   created () {
     this.queryParam.companyId = this.$route.query.id
+    // this.queryParam.companyId = 26677
     this.getDataInfo()
   },
   methods: {
