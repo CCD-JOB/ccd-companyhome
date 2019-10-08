@@ -86,7 +86,7 @@
           p
             i.iconfont &#xe6d3;
             span 投资范围：
-            p {{productInfo.investRange}}
+            b(:class="{'canFold':isFold}" @click="isFold=!isFold" :data-content="isFold?'收起':'展开'") {{productInfo.investRange}}
       warning-info(
         @handleChangeBtn="handleChangeBtn"
         ref="warningInfo"
@@ -99,8 +99,6 @@
       h2 请下载app进行体验
       div
         el-button(type="primary" @click="goDownload") 去下载
-  </span>
-
 </template>
 
 <script>
@@ -134,6 +132,7 @@ export default {
       productInfo: {},
       showMinute: false,
       isHomeAlertGoDialogVisible: false,
+      isFold: false,
       currentSelect: 0,
       queryParam: {
         startPage: 1,
@@ -492,7 +491,7 @@ export default {
 			}
 		}
 		.main-part-basic {
-			padding: 20px 36px 0;
+			padding: 20px 0 20px 36px;
 			h3 {
 				padding: 28px 0;
 				font-size: 36px;
@@ -502,14 +501,38 @@ export default {
 			}
 			.basic {
 				background: #fafafa;
-				padding: 20px;
+				padding: 20px 60px 20px 20px;
 			}
 			.minute {
 				background: #f6f6f6;
-				padding: 30px 20px 0;
+				padding: 30px 20px;
 			}
 			p {
 				padding-top: 20px;
+				b {
+					display: block;
+					font-size: 26px;
+					font-weight: 500;
+					line-height: 40px;
+					padding: 0 50px 0 60px;
+					color: #666;
+					overflow: hidden;
+					text-overflow: clip;
+					display: -webkit-box;
+					-webkit-box-orient: vertical;
+					-webkit-line-clamp: 3;
+					position: relative;
+					&:after {
+						position: absolute;
+						right: 0;
+						bottom: 0;
+						content: attr(data-content);
+						color: #1253fc;
+					}
+					&.canFold {
+						display: block;
+					}
+				}
 				i {
 					font-size: 38px;
 					color: #000;

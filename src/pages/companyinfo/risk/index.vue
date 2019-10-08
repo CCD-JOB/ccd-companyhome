@@ -185,7 +185,7 @@ export default {
   },
   created () {
     this.queryParam.companyId = this.$route.query.id
-    // this.queryParam.companyId = 26677
+    this.queryParam.companyId = 26677
     this.getDataInfo()
   },
   methods: {
@@ -303,15 +303,15 @@ export default {
 		height: 100%;
 		.risk-info-sider {
 			width: 216px !important;
-			background: #1253fc;
+			background: rgb(248, 248, 248);
 			ul {
 				li {
-					padding-left: 20px;
+					padding-left: 10px;
 					margin-top: 21px;
+					border-left: 10px solid transparent;
 					span {
 						font-size: 28px;
 						line-height: 77px;
-						color: #fff;
 						font-weight: 500;
 						padding-left: 5px;
 						&:nth-of-type(2) {
@@ -319,7 +319,12 @@ export default {
 						}
 					}
 					&.active {
-						background: #fff;
+						background-image: linear-gradient(
+							to right,
+							rgba(24, 87, 252, 0.2),
+							#fff
+						);
+						border-left-color: #1253fc;
 						span {
 							color: #000;
 						}

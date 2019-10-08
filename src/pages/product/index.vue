@@ -19,8 +19,8 @@
       .top-part-btns
         el-button(type="primary") {{productInfo.type}}
     .main-part
-      .main-part-info(@click="isHomeAlertGoDialogVisible = true") 风险提示
-        span 未按要求进行产品更新或着其他原因呵呵呵呵呵
+      .main-part-info(v-if="mainInfoList.length" @click="isHomeAlertGoDialogVisible=true") {{mainInfoFirst.code | maininfoTitleFilter}}
+        span {{mainInfoFirst.content}}
         i.iconfont &#xe64d;
       .main-part-slide
         .swiper-container
@@ -55,10 +55,12 @@
         .minute(v-show="showMinute")
           p
             i.iconfont &#xe625;
-            span 投资门槛： {{productInfo.investThreshold}}
+            span 投资门槛：
+              em {{productInfo.investThreshold}}
           p
             i.iconfont &#xe609;
-            span 付息方式： {{productInfo.paymentMethod}}
+            span 付息方式：
+              em {{productInfo.paymentMethod}}
           p
             i.iconfont &#xe652;
             span.spec 费用标准：
@@ -68,7 +70,7 @@
           p
             i.iconfont &#xe6d3;
             span 投资范围：
-            p {{productInfo.investRange}}
+            b(:class="{'canFold':isFold}" @click="isFold=!isFold" :data-content="isFold?'收起':'展开'") {{productInfo.investRange}}
       warning-info(
         @handleChangeBtn="handleChangeBtn"
         ref="warningInfo"
@@ -76,13 +78,17 @@
         :listInfo="warningListInfo"
         :currentSelect="currentSelect"
       )
+  home-modal(:isHomeModalVisible="isHomeModalVisible" @close="isHomeModalVisible=false")
+    ul.home-modal-slot
+      li(v-for="item in mainInfoList" :key="item.code")
+        i.iconfont &#xe710;
+          span {{item.code | maininfoTitleFilter}}
+        p {{item.content}}
   home-modal(title="提示" :isHomeModalVisible="isHomeAlertGoDialogVisible" @close="isHomeAlertGoDialogVisible=false")
     .home-alert-go-download-slot
       h2 请下载app进行体验
       div
         el-button(type="primary" @click="goDownload") 去下载
-  </span>
-
 </template>
 
 <script>
@@ -116,7 +122,9 @@ export default {
       productInfo: {},
       showMinute: false,
       isHomeAlertGoDialogVisible: false,
+      isHomeModalVisible: false,
       currentSelect: 0,
+      isFold: false,
       queryParam: {
         startPage: 1,
         pageSize: 10,
@@ -126,6 +134,9 @@ export default {
       warningBtns,
       warningList: [],
       warningListInfo: {},
+      // 异常机构相关
+      mainInfoList: [],
+      mainInfoListInfo: [],
       scrollY: -1
     }
   },
@@ -135,8 +146,49 @@ export default {
     this.id = this.$route.query.id
     this.getWarningListPart()
     this.getBasicInfo()
+    this.getMainInfoList()
+  },
+  computed: {
+    mainInfoFirst () {
+      if (this.mainInfoList.length) {
+        return {
+          code: this.mainInfoList[0].code,
+          content: this.mainInfoList[0].content
+        }
+      } else {
+        return {
+          name: '',
+          content: ''
+        }
+      }
+    }
   },
   methods: {
+    // 展示异常机构信息
+    async getMainInfoList () {
+      let param = {
+        administratorId: this.id
+      }
+      try {
+        let result = await this.$api.home.getHonestyInfo(param).then(res => {
+          return JSON.parse(res)
+        })
+        let arr = []
+        let temp = { ...result.data }
+        delete temp.flag
+        for (let key in temp) {
+          arr.push({
+            code: key,
+            content: temp[key]
+          })
+        }
+        this.mainInfoList = [...arr]
+        this.mainInfoListInfo = result.data
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    // 获取基本信息
     async getBasicInfo () {
       try {
         let param = {
@@ -203,6 +255,10 @@ export default {
       this.resetWarningListParam()
       this.getWarningListPart()
     },
+    // 展示异常机构弹框
+    handleGoMainPartInfo () {
+      this.isHomeModalVisible = this.mainInfoListInfo.flag
+    },
     // 切换详情
     switchMinute () {
       this.showMinute = !this.showMinute
@@ -242,6 +298,39 @@ export default {
         this.$refs.titleFixed.style.top = '-300px'
       }
     }
+  },
+  filters: {
+    maininfoTitleFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (val) {
+        case 'outOfContact':
+          str = '失联机构'
+          break
+        case 'abnormal':
+          str = '异常机构'
+          break
+        case 'regulatoryMeasures':
+          str = '监管措施'
+          break
+        case 'falseSubmit':
+          str = '虚假填报'
+          break
+        case 'importantOmissions':
+          str = '重大遗漏'
+          break
+        case 'violation':
+          str = '违反规定'
+          break
+        case 'dishonesty':
+          str = '不诚信记录'
+          break
+        case 'otheHonesty':
+          str = '其他诚信记录'
+          break
+      }
+      return str
+    }
   }
 }
 </script>
@@ -270,6 +359,7 @@ export default {
 	left: 0;
 	right: 0;
 	z-index: 1;
+	overflow-y: scroll;
 	.main-part-warning-info-fixed-title {
 		width: 100%;
 		position: absolute;
@@ -375,18 +465,17 @@ export default {
 					width: 400px !important;
 					height: 150px;
 					padding: 30px;
-					background: #fff;
-					box-shadow: 5px 5px 20px 2px rgba(0, 0, 0, 0.12);
+					box-shadow: 1px 1px 10px 2px rgba(0, 0, 0, 0.12);
 					border-radius: 20px;
 					.content {
 						display: flex;
-						justify-content: space-between;
+						justify-content: flex-start;
 						img {
-							width: 70px;
-							height: 70px;
+							width: 48px;
+							height: 48px;
 						}
 						.info {
-							padding-left: 20px;
+							padding-left: 22px;
 							h5 {
 								font-size: 30px;
 								line-height: 50px;
@@ -402,9 +491,9 @@ export default {
 								border: 2px solid #bbc1ce;
 							}
 							p {
+								width: 320px;
 								margin-top: 10px;
 								font-size: 26px;
-								font-weight: bold;
 								line-height: 36px;
 								color: #878787;
 							}
@@ -441,14 +530,14 @@ export default {
 				}
 			}
 			i {
-				font-size: 30px;
+				font-size: 44px;
 				vertical-align: bottom;
 				color: #666;
-				padding-left: 180px;
+				padding-left: 150px;
 			}
 		}
 		.main-part-basic {
-			padding: 20px 36px 0;
+			padding: 20px 0 20px 36px;
 			h3 {
 				padding: 28px 0;
 				font-size: 36px;
@@ -457,15 +546,39 @@ export default {
 				color: #333333;
 			}
 			.basic {
+				padding: 20px 60px 20px 20px;
 				background: #fafafa;
-				padding: 20px;
 			}
 			.minute {
 				background: #f6f6f6;
-				padding: 30px 20px 0;
+				padding: 30px 20px;
 			}
 			p {
 				padding-top: 20px;
+				b {
+					display: block;
+					font-size: 26px;
+					font-weight: 500;
+					line-height: 40px;
+					padding: 0 50px 0 60px;
+					color: #666;
+					overflow: hidden;
+					text-overflow: clip;
+					display: -webkit-box;
+					-webkit-box-orient: vertical;
+					-webkit-line-clamp: 3;
+					position: relative;
+					&:after {
+						position: absolute;
+						right: 0;
+						bottom: 0;
+						content: attr(data-content);
+						color: #1253fc;
+					}
+					&.canFold {
+						display: block;
+					}
+				}
 				i {
 					font-size: 38px;
 					color: #000;
@@ -475,9 +588,13 @@ export default {
 				span {
 					font-size: 26px;
 					line-height: 50px;
-					color: #333333;
+					color: #333;
 					font-weight: bold;
 					margin-left: 20px;
+					vertical-align: middle;
+					em {
+						color: #666;
+					}
 					&.spec:nth-of-type(2) {
 						display: block;
 						em {

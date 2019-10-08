@@ -87,6 +87,12 @@ export default [
         component: resolve =>
           import('pages/product/intrustplan').then(module => resolve(module))
       },
+      {
+        path: '/fillinginfo',
+        name: 'fillinginfo',
+        component: resolve =>
+          import('pages/product/fillingInfo').then(module => resolve(module))
+      },
       // 管理主页
       {
         path: '/manager',

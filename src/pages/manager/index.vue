@@ -24,12 +24,12 @@
       .main-part-info
         p {{managerInfo.legalPerson.basicIntroduction}}
         el-divider
-        p 具有基金从业资格 {{managerInfo.legalPerson.qualifiedWay}}
+        p 具有基金从业资格 （{{managerInfo.legalPerson.qualifiedWay}}）
         el-divider
       .main-part-job
         h3 工作履历
-        el-timeline(v-for="item in managerInfo.workResumeList" :key="item.id")
-          el-timeline-item {{item.startTime}}  -  {{item.endTime}}
+        el-timeline
+          el-timeline-item(v-for="item in managerInfo.workResumeList" :key="item.id") {{item.startTime.replace('-','.')}}  -  {{item.endTime.replace('-','.')}}
             h5 {{item.tenureUnit}}
             p
               span {{item.duty}}
@@ -300,12 +300,13 @@ export default {
 				font-size: 36px;
 				font-weight: bold;
 				line-height: 56px;
-				color: #333333;
+				color: #333;
 			}
 			.el-timeline {
 				.el-timeline-item__tail {
-					margin-left: 10px;
+					margin-left: 16px;
 					margin-top: 10px;
+					background-color: #eee;
 				}
 				.el-timeline-item__node {
 					margin-top: 8px;
@@ -316,7 +317,7 @@ export default {
 					box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12);
 				}
 				.el-timeline-item__content {
-					margin-left: 24px;
+					margin-left: 44px;
 					font-size: 28px;
 					line-height: 50px;
 					color: #666;
