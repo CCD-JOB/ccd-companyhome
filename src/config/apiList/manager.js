@@ -7,6 +7,14 @@ export const getManagermessageInfo = params => {
   })
 }
 
+export const getSeniorInfo = params => {
+  return axios({
+    url: '/infor/getSeniorInfo',
+    params
+  })
+}
+
 export default {
-  getManagermessageInfo
+  getManagermessageInfo,
+  getSeniorInfo
 }

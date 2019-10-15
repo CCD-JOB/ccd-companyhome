@@ -12,16 +12,18 @@
     :probe-type="probeType"
     @scrollToEnd="handleLoadMore"
     @scroll="scroll"
+    :isTip="!!warningList.length"
   )
     .top-part
       el-badge.top-part-iv-badge(is-dot)
         h3 {{productInfo.fullName}}
       .top-part-btns
         el-button(type="primary") {{productInfo.type}}
+        el-button(type="primary") {{state | fundStateFilter}}
     .main-part
-      .main-part-info(v-if="mainInfoList.length" @click="isHomeAlertGoDialogVisible=true") {{mainInfoFirst.code | maininfoTitleFilter}}
-        span {{mainInfoFirst.content}}
-        i.iconfont &#xe64d;
+      //- .main-part-info(v-if="mainInfoList.length" @click="tmpShowAlert") {{mainInfoFirst.code | maininfoTitleFilter}}
+      //-   span {{mainInfoFirst.content}}
+      //-   i.iconfont &#xe64d;
       .main-part-slide
         .swiper-container
           .swiper-wrapper
@@ -31,13 +33,13 @@
                 .info
                   .flex-b
                     h5 {{item.name}}
-                    el-button(round) 产品
+                    el-button(round @click="tmpShowAlert") 产品
                   p {{item.value}}
-      .main-part-job.flex-s(@click="isHomeAlertGoDialogVisible=true")
+      .main-part-job.flex-s(@click="tmpShowAlert")
         h3 备案信息
         .flex-e
           div
-            p {{productInfo.latestUpdateTime}}
+            p {{productInfo.recordTime}}
             p 最后更新时间
           i.iconfont &#xe64d;
       .main-part-basic
@@ -54,7 +56,7 @@
           i.iconfont(v-show="showMinute" @click="switchMinute") &#xe64b;
         .minute(v-show="showMinute")
           p
-            i.iconfont &#xe625;
+            i.iconfont &#xe614;
             span 投资门槛：
               em {{productInfo.investThreshold}}
           p
@@ -62,7 +64,7 @@
             span 付息方式：
               em {{productInfo.paymentMethod}}
           p
-            i.iconfont &#xe652;
+            i.iconfont &#xe859;
             span.spec 费用标准：
               em 托管费/年 {{productInfo.hostingFee}}
             span.spec
@@ -118,7 +120,7 @@ export default {
   },
   data () {
     return {
-      id: '',
+      state: 300,
       productInfo: {},
       showMinute: false,
       isHomeAlertGoDialogVisible: false,
@@ -129,7 +131,8 @@ export default {
         startPage: 1,
         pageSize: 10,
         type: 1,
-        administratorId: ''
+        productId: '',
+        productType: 1
       },
       warningBtns,
       warningList: [],
@@ -143,56 +146,26 @@ export default {
   created () {
     this.probeType = 3
     this.listenScroll = true
-    this.id = this.$route.query.id
-    this.getWarningListPart()
-    this.getBasicInfo()
-    this.getMainInfoList()
-  },
-  computed: {
-    mainInfoFirst () {
-      if (this.mainInfoList.length) {
-        return {
-          code: this.mainInfoList[0].code,
-          content: this.mainInfoList[0].content
-        }
-      } else {
-        return {
-          name: '',
-          content: ''
-        }
-      }
-    }
+    this.queryParam.productId = this.$route.query.productid
+    this.queryParam.productType = this.$route.query.producttype
+    this.state = this.$route.query.state
+
+    // this.queryParam.productId = 1547452014555
+    // this.queryParam.productType = 1
+
+    this._initialGetInfo()
   },
   methods: {
-    // 展示异常机构信息
-    async getMainInfoList () {
-      let param = {
-        administratorId: this.id
-      }
-      try {
-        let result = await this.$api.home.getHonestyInfo(param).then(res => {
-          return JSON.parse(res)
-        })
-        let arr = []
-        let temp = { ...result.data }
-        delete temp.flag
-        for (let key in temp) {
-          arr.push({
-            code: key,
-            content: temp[key]
-          })
-        }
-        this.mainInfoList = [...arr]
-        this.mainInfoListInfo = result.data
-      } catch (error) {
-        console.log(error)
-      }
+    _initialGetInfo () {
+      this.getBasicInfo()
+      this.getWarningListPart()
+      // this.getMainInfoList()
     },
     // 获取基本信息
     async getBasicInfo () {
       try {
         let param = {
-          productId: 1547452014555,
+          productId: this.queryParam.productId,
           type: 1
         }
         let result = await this.$api.product.getProductBasicInfo(param)
@@ -202,14 +175,37 @@ export default {
         })
       } catch (error) {}
     },
+    // 展示异常机构信息
+    // async getMainInfoList () {
+    //   let param = {
+    //     administratorId: this.id
+    //   }
+    //   try {
+    //     let result = await this.$api.home.getHonestyInfo(param).then(res => {
+    //       return JSON.parse(res)
+    //     })
+    //     let arr = []
+    //     let temp = { ...result.data }
+    //     delete temp.flag
+    //     for (let key in temp) {
+    //       arr.push({
+    //         code: key,
+    //         content: temp[key]
+    //       })
+    //     }
+    //     this.mainInfoList = [...arr]
+    //     this.mainInfoListInfo = result.data
+    //   } catch (error) {
+    //     console.log(error)
+    //   }
+    // },
     // 获取舆情信息
     async getWarningListPart () {
       try {
         this.queryParam.type = this.currentSelect + 1
-        this.queryParam.administratorId = this.id
 
-        let result = await this.$api.home
-          .getOpinionInfo(this.queryParam)
+        let result = await this.$api.product
+          .getProductInfo(this.queryParam)
           .then(res => {
             return JSON.parse(res)
           })
@@ -234,12 +230,10 @@ export default {
       this.warningListInfo = {
         totalPages: 0
       }
-      this.queryParam = {
+      this.queryParam = Object.assign(this.queryParam, {
         startPage: 1,
-        pageSize: 10,
-        type: 1,
-        administratorId: this.id
-      }
+        pageSize: 10
+      })
     },
     // 加载更多
     handleLoadMore () {
@@ -284,10 +278,26 @@ export default {
     // 监听滚动
     scroll (pos) {
       this.scrollY = pos.y
+    },
+    // 临时提示下载
+    tmpShowAlert () {
+      this.isHomeAlertGoDialogVisible = true
     }
   },
-  beforeDestroy () {
-    this.mySwiper.destroy(false)
+  computed: {
+    mainInfoFirst () {
+      if (this.mainInfoList.length) {
+        return {
+          code: this.mainInfoList[0].code,
+          content: this.mainInfoList[0].content
+        }
+      } else {
+        return {
+          name: '',
+          content: ''
+        }
+      }
+    }
   },
   watch: {
     scrollY (newY) {
@@ -295,7 +305,7 @@ export default {
         this.$refs.titleFixed.style.top = 0
       }
       if (-newY < 1600) {
-        this.$refs.titleFixed.style.top = '-300px'
+        this.$refs.titleFixed.style.top = '-350px'
       }
     }
   },
@@ -330,7 +340,35 @@ export default {
           break
       }
       return str
+    },
+    fundStateFilter: val => {
+      let str = ''
+      if (!val) return str
+      switch (Number(val)) {
+        case 300:
+          str = '正在运作'
+          break
+        case 301:
+          str = '正常清算'
+          break
+        case 302:
+          str = '提前清算'
+          break
+        case 303:
+          str = '延期清算'
+          break
+        case 304:
+          str = '非正常清算'
+          break
+        case 305:
+          str = '投顾协议已终止'
+          break
+      }
+      return str
     }
+  },
+  beforeDestroy () {
+    this.mySwiper.destroy(false)
   }
 }
 </script>
@@ -363,7 +401,7 @@ export default {
 	.main-part-warning-info-fixed-title {
 		width: 100%;
 		position: absolute;
-		top: -300px;
+		top: -350px;
 		left: 0;
 		transition: 1s;
 		padding: 30px 36px;
@@ -412,6 +450,7 @@ export default {
 				width: 10px;
 				height: 10px;
 				margin-right: -10px;
+				display: none;
 			}
 		}
 
@@ -458,7 +497,7 @@ export default {
 			}
 		}
 		.main-part-slide {
-			padding: 20px 36px;
+			padding: 20px 0;
 			.swiper-wrapper {
 				margin: 0 36px 10px;
 				.swiper-slide {
@@ -483,8 +522,7 @@ export default {
 							}
 							.el-button {
 								font-size: 20px;
-								font-weight: bold;
-								line-height: 50px;
+								line-height: 40px;
 								padding: 0 30px;
 								color: #bbc1ce;
 								border-radius: 60px;
@@ -581,8 +619,8 @@ export default {
 				}
 				i {
 					font-size: 38px;
-					color: #000;
 					font-weight: bold;
+					color: #000;
 					vertical-align: middle;
 				}
 				span {

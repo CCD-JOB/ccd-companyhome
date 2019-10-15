@@ -6,12 +6,18 @@
         li(v-for="(item,index) in warningBtns" :key="item.id" @click="handleChangeBtn(index)" )
           button(:class="{active:currentSelect === index}") {{item.name}}
     ul.main-part-warning-info-list
-      li(v-for="item in list" :key="item.id" ref="listGroup")
+      li(v-for="item in list" :key="item.id" ref="listGroup" @click="goDetail(item.id)")
         .left
           p {{item.title}}
           span {{item.sourceForm}}
           span {{item.releaseDate}}
         img(:src="item.coverPath" v-if="item.coverPath")
+    .nolist(v-if="!list.length")
+      img(:src="nolistImg")
+      .tip
+        p 暂无舆情信息
+        p 如果您所关注的内容有新的舆情信息出来
+        p 我们将第一时间通知
 </template>
 
 <script>
@@ -38,12 +44,16 @@ export default {
   data () {
     return {
       // 舆情按钮
-      warningBtns
+      warningBtns,
+      nolistImg: require('./img/nolist.png')
     }
   },
   methods: {
     handleChangeBtn (index) {
       this.$emit('handleChangeBtn', index)
+    },
+    goDetail (id) {
+      window.location.href = `https://info.aifound.cn/newDetail.html?id=${id}`
     }
   }
 }
@@ -116,6 +126,32 @@ export default {
 				height: 168px;
 				border-radius: 20px;
 				margin-left: 20px;
+			}
+		}
+	}
+	.nolist {
+		text-align: center;
+		padding-bottom: 150px;
+		img {
+			width: 430px;
+			height: 430px;
+		}
+		.tip {
+			text-align: center;
+			margin-top: -80px;
+			p:nth-of-type(1) {
+				font-size: 28px;
+				font-weight: 800;
+				line-height: 50px;
+				color: #42414d;
+				margin-bottom: 20px;
+			}
+			p:nth-of-type(2),
+			p:nth-of-type(3) {
+				font-size: 20px;
+				font-weight: 400;
+				line-height: 30px;
+				color: #a7a6af;
 			}
 		}
 	}

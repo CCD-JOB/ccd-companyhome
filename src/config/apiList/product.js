@@ -7,7 +7,15 @@ export const getProductBasicInfo = params => {
   })
 }
 
+export const getProductInfo = params => {
+  return axios({
+    url: '/infor/getProductInfo',
+    params
+  })
+}
+
 // 默认全部倒出
 export default {
-  getProductBasicInfo
+  getProductBasicInfo,
+  getProductInfo
 }

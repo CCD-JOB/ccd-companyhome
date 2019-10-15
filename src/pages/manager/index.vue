@@ -12,21 +12,22 @@
     :probe-type="probeType"
     @scrollToEnd="handleLoadMore"
     @scroll="scroll"
+    :isTip="!!warningList.length"
   )
     .main-part
-      .main-part-title
+      .main-part-title(ref="titleEl")
         el-avatar.top-part-avatar(:shape="'circle'") {{avatarName}}
         .right
           h3 {{managerInfo.legalPerson.name}}
           p {{managerInfo.legalPerson.fullName}}
           p
             span {{managerInfo.legalPerson.duty}}
-      .main-part-info
+      .main-part-info(ref="infoEl")
         p {{managerInfo.legalPerson.basicIntroduction}}
         el-divider
         p 具有基金从业资格 （{{managerInfo.legalPerson.qualifiedWay}}）
         el-divider
-      .main-part-job
+      .main-part-job(ref="jobEl")
         h3 工作履历
         el-timeline
           el-timeline-item(v-for="item in managerInfo.workResumeList" :key="item.id") {{item.startTime.replace('-','.')}}  -  {{item.endTime.replace('-','.')}}
@@ -77,7 +78,7 @@ export default {
         startPage: 1,
         pageSize: 10,
         type: 1,
-        administratorId: ''
+        seniorId: ''
       },
       warningBtns,
       warningList: [],
@@ -89,28 +90,18 @@ export default {
     this.probeType = 3
     this.listenScroll = true
     this.id = this.$route.query.id
-    this.roleType = this.$route.query.roleType
-    this.seniorExecutiveId = this.$route.query.seniorExecutiveId
+    this.roleType = this.$route.query.roletype
+    this.seniorExecutiveId = this.$route.query.seniorexecutiveid
     // this.id = 1547451652420
     // this.roleType = 11
     // this.seniorExecutiveId = 1547451501510
-    this.getManagermessageInfo()
-    this.getWarningListPart()
-  },
-  computed: {
-    avatarName () {
-      if (
-        this.managerInfo &&
-				this.managerInfo.legalPerson &&
-				this.managerInfo.legalPerson.name
-      ) {
-        return this.managerInfo.legalPerson.name.slice(0, 1)
-      } else {
-        return ''
-      }
-    }
+    this._initialGetInfo()
   },
   methods: {
+    _initialGetInfo () {
+      this.getManagermessageInfo()
+      this.getWarningListPart()
+    },
     // 获取法人信息
     async getManagermessageInfo () {
       try {
@@ -127,10 +118,10 @@ export default {
     async getWarningListPart () {
       try {
         this.queryParam.type = this.currentSelect + 1
-        this.queryParam.administratorId = this.id
+        this.queryParam.seniorId = this.id
 
-        let result = await this.$api.home
-          .getOpinionInfo(this.queryParam)
+        let result = await this.$api.manager
+          .getSeniorInfo(this.queryParam)
           .then(res => {
             return JSON.parse(res)
           })
@@ -156,12 +147,10 @@ export default {
       this.warningListInfo = {
         totalPages: 0
       }
-      this.queryParam = {
+      this.queryParam = Object.assign(this.queryParam, {
         startPage: 1,
-        pageSize: 10,
-        type: 1,
-        administratorId: this.id
-      }
+        pageSize: 10
+      })
     },
     // 舆情 - 加载更多
     handleLoadMore () {
@@ -183,13 +172,30 @@ export default {
       this.scrollY = pos.y
     }
   },
+  computed: {
+    avatarName () {
+      if (
+        this.managerInfo &&
+				this.managerInfo.legalPerson &&
+				this.managerInfo.legalPerson.name
+      ) {
+        return this.managerInfo.legalPerson.name.slice(0, 1)
+      } else {
+        return ''
+      }
+    }
+  },
   watch: {
     scrollY (newY) {
-      if (-newY > 1900) {
+      let height =
+				this.$refs.titleEl.offsetHeight +
+				this.$refs.infoEl.offsetHeight +
+				this.$refs.jobEl.offsetHeight
+      if (-newY > height) {
         this.$refs.titleFixed.style.top = 0
       }
-      if (-newY < 1600) {
-        this.$refs.titleFixed.style.top = '-300px'
+      if (-newY < height) {
+        this.$refs.titleFixed.style.top = '-350px'
       }
     }
   }
@@ -207,7 +213,7 @@ export default {
 	.main-part-warning-info-fixed-title {
 		width: 100%;
 		position: absolute;
-		top: -300px;
+		top: -350px;
 		left: 0;
 		transition: 1s;
 		padding: 30px 36px;

@@ -1,12 +1,13 @@
 <template lang="pug">
-  div.business-info-wrapper
+  .business-info-wrapper
     .business-info-top-wrapper
       h2 华设资产管理（上海）有限公司
       ul.flex-b
         li(v-for="(item,index) in topBtnGroup" :key="item.id" @click="currentSelect = index" :class="currentSelect===index?'active':''")
           p {{item.num}}
           p {{item.name}}
-    keep-alive
+    p.noInfo(v-if="noInfo") 暂无相关信息
+    keep-alive(v-if="!noInfo")
       component(v-bind:is="currentTabComponent[currentSelect]")
 </template>
 <script>
@@ -24,6 +25,7 @@ export default {
   data () {
     return {
       currentSelect: 0,
+      noInfo: false,
       currentTabComponent: [
         'business-com',
         'shareholder-com',
@@ -60,6 +62,12 @@ export default {
 <style lang="scss">
 .business-info-wrapper {
 	padding-top: 40px;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow-y: scroll;
 	.business-info-top-wrapper {
 		padding: 0 36px 20px;
 		h2 {
@@ -88,6 +96,16 @@ export default {
 				}
 			}
 		}
+	}
+	.noInfo {
+		font-size: 32px;
+		line-height: 50px;
+		color: #666;
+		font-weight: 500;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 	}
 }
 </style>

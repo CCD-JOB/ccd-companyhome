@@ -8,16 +8,18 @@
   scroll-com(ref="scrollCom"
     pullup
     :data="warningList"
+    :isTip="!!warningList.length"
     :listen-scroll="listenScroll"
     :probe-type="probeType"
     @scrollToEnd="handleLoadMore"
     @scroll="scroll"
   )
     .top-part
-      el-badge.top-part-iv-badge(is-dot :count="1" )
+      el-badge.top-part-iv-badge(is-dot :class="{status:isBusiness}")
         el-avatar.top-part-avatar(:shape="'circle'") {{avatarName}}
-      button.top-part-btn
-        span 私募
+      p.top-part-btn
+        span(v-show="homeInfo.type == 1||homeInfo.type == 3") 私募
+        span(v-show="homeInfo.type == 2||homeInfo.type == 3") 信托
     .main-part
       .main-part-icon-group
         i.iconfont(@click="tmpShowAlert") &#xe935;
@@ -46,16 +48,16 @@
           p 总数 {{productListInfo.total}}
             i.iconfont &#xe64d;
         ul.main-part-product-info-list
-          li.flex-b(v-for="item in productList" :key="item.id" )
-            em(:style="item.fundState | fundStateBadgeFilter")
+          li.flex-b(v-for="(item,index) in productList" :key="item.id" )
+            em(:style="index | fundStateBadgeFilter")
             span.text {{item.fullName}}
-            span.status {{item.fundState | fundStateFilter}}
+            span.status(:style="item.fundState | fundStateTxtFilter") {{item.fundState | fundStateFilter}}
         .main-part-product-info-btn
           button(@click="tmpShowAlert")
-            i.iconfont &#xe618;
+            i.iconfont &#xe613;
             span 产品分析
-          button(@click="handleGoProductAtlas")
-            i.iconfont &#xe918;
+          button(@click="tmpShowAlert")
+            i.iconfont &#xe70e;
             span 产品图谱
       warning-info(
         @handleChangeBtn="handleChangeBtn"
@@ -67,7 +69,7 @@
   home-drawer(:isHomeDrawerVisible="isHomeDrawerVisible" @close="isHomeDrawerVisible=false")
     .home-drawer-slot
       .home-drawer-top
-        el-badge(is-dot)
+        el-badge(is-dot :class="{status:isBusiness}")
           el-avatar.top-part-avatar(:shape="'circle'") {{avatarName}}
         h3 {{homeInfo.fullName}}
       .home-drawer-bottom
@@ -130,7 +132,7 @@ const operateList = [
     name: '风险信息',
     src: require('./img/icon3.png'),
     linkto: '/companyinfo/risk',
-    showmodal: false
+    showmodal: true
   },
   {
     name: '历史变更',
@@ -155,6 +157,7 @@ export default {
   data () {
     return {
       id: '',
+      isBusiness: 0,
       isHomeDrawerVisible: false,
       isHomeModalVisible: false,
       isHomeAlertGoDialogVisible: false,
@@ -174,7 +177,7 @@ export default {
         startPage: 1,
         pageSize: 10,
         type: 1,
-        administratorId: ''
+        administratorId: this.id
       },
       warningList: [],
       warningListInfo: {},
@@ -185,35 +188,17 @@ export default {
     this.probeType = 3
     this.listenScroll = true
     this.id = this.$route.query.id
+    this.isBusiness = this.$route.query.isbusiness
     // this.id = 1547451658666
-    this.getBasicInfo()
-    this.getProductList()
-    this.getMainInfoList()
-    this.getWarningListPart()
-  },
-  computed: {
-    avatarName () {
-      if (this.homeInfo && this.homeInfo.fullName) {
-        return this.homeInfo && this.homeInfo.fullName.slice(0, 1)
-      } else {
-        return ''
-      }
-    },
-    mainInfoFirst () {
-      if (this.mainInfoList.length) {
-        return {
-          code: this.mainInfoList[0].code,
-          content: this.mainInfoList[0].content
-        }
-      } else {
-        return {
-          name: '',
-          content: ''
-        }
-      }
-    }
+    this._initialGetInfo()
   },
   methods: {
+    _initialGetInfo () {
+      this.getBasicInfo()
+      this.getProductList()
+      this.getMainInfoList()
+      this.getWarningListPart()
+    },
     // 获取基本信息
     async getBasicInfo () {
       try {
@@ -311,12 +296,10 @@ export default {
       this.warningListInfo = {
         totalPages: 0
       }
-      this.queryParam = {
+      this.queryParam = Object.assign(this.queryParam, {
         startPage: 1,
-        pageSize: 10,
-        type: 1,
-        administratorId: this.id
-      }
+        pageSize: 10
+      })
     },
     // 舆情 - 加载更多
     handleLoadMore () {
@@ -381,6 +364,28 @@ export default {
       this.isHomeAlertGoDialogVisible = true
     }
   },
+  computed: {
+    avatarName () {
+      if (this.homeInfo && this.homeInfo.fullName) {
+        return this.homeInfo && this.homeInfo.fullName.slice(0, 1)
+      } else {
+        return ''
+      }
+    },
+    mainInfoFirst () {
+      if (this.mainInfoList.length) {
+        return {
+          code: this.mainInfoList[0].code,
+          content: this.mainInfoList[0].content
+        }
+      } else {
+        return {
+          name: '',
+          content: ''
+        }
+      }
+    }
+  },
   filters: {
     maininfoTitleFilter: val => {
       let str = ''
@@ -438,27 +443,42 @@ export default {
       }
       return str
     },
-    fundStateBadgeFilter: val => {
+    fundStateTxtFilter: val => {
       let str = ''
       if (!val) return str
       switch (val) {
         case 300:
-          str = 'border-color:#00ff80'
+          str = 'color:rgb(60,111,220)'
           break
         case 301:
-          str = 'border-color:#ff80c0'
+          str = 'color:#999'
           break
         case 302:
-          str = 'border-color:#ff8000'
+          str = 'color:#999'
           break
         case 303:
-          str = 'border-color:green'
+          str = 'color:#FF5D5D'
           break
         case 304:
-          str = 'border-color:#8000ff'
+          str = 'color:#FF5D5D'
           break
         case 305:
-          str = 'border-color:#b004040'
+          str = 'color:#999'
+          break
+      }
+      return str
+    },
+    fundStateBadgeFilter: val => {
+      let str = ''
+      switch (val) {
+        case 0:
+          str = 'border-color:#22D195'
+          break
+        case 1:
+          str = 'border-color:#8244FF'
+          break
+        case 2:
+          str = 'border-color:#FF5D5D'
           break
       }
       return str
@@ -466,11 +486,15 @@ export default {
   },
   watch: {
     scrollY (newY) {
-      if (-newY > 1900) {
+      let height =
+				this.$refs.titleEl.offsetHeight +
+				this.$refs.infoEl.offsetHeight +
+				this.$refs.jobEl.offsetHeight
+      if (-newY > height) {
         this.$refs.titleFixed.style.top = 0
       }
-      if (-newY < 1600) {
-        this.$refs.titleFixed.style.top = '-300px'
+      if (-newY < height) {
+        this.$refs.titleFixed.style.top = '-350px'
       }
     }
   }
@@ -493,7 +517,12 @@ export default {
 				width: 20px;
 				height: 20px;
 				margin-top: 120px;
-				margin-right: 20px;
+				margin-right: 30px;
+			}
+			&.status {
+				.el-badge__content {
+					background-color: #3fec3d;
+				}
 			}
 		}
 		h3 {
@@ -575,7 +604,7 @@ export default {
 	.main-part-warning-info-fixed-title {
 		width: 100%;
 		position: absolute;
-		top: -300px;
+		top: -350px;
 		left: 0;
 		transition: 1s;
 		padding: 30px 36px;
@@ -611,11 +640,11 @@ export default {
 		}
 	}
 	.top-part {
+		position: relative;
+		z-index: 1;
 		padding: 10px 36px;
 		display: flex;
 		justify-content: space-between;
-		position: relative;
-		z-index: 1;
 		.top-part-iv-badge {
 			.top-part-avatar {
 				width: 144px;
@@ -624,21 +653,29 @@ export default {
 				font-size: 50px;
 			}
 			.el-badge__content {
-				width: 20px;
-				height: 20px;
-				margin-top: 120px;
-				margin-right: 20px;
+				width: 30px;
+				height: 30px;
+				margin-top: 125px;
+				margin-right: 30px;
+			}
+			&.status {
+				.el-badge__content {
+					background-color: #3fec3d;
+				}
 			}
 		}
 		.top-part-btn {
-			margin-top: 17px;
-			background: #1253fc;
+			margin-top: 35px;
 			border-radius: 8px;
 			height: 40px;
 			font-size: 22px;
 			color: #fff;
 			span {
+				background: #1253fc;
 				padding: 8px 20px;
+				margin: 0 5px;
+				border: none;
+				border-radius: 8px;
 			}
 		}
 	}
@@ -650,7 +687,7 @@ export default {
 		.main-part-icon-group {
 			text-align: center;
 			margin-top: 15px;
-			padding: 0 36px;
+			padding: 30px 36px 0;
 			position: relative;
 			z-index: 2;
 			i {
@@ -785,11 +822,11 @@ export default {
 					margin-left: 32px;
 				}
 				i {
-					font-size: 50px;
+					font-size: 34px;
 					line-height: 48px;
 					font-weight: bold;
+					margin-right: 10px;
 					color: rgba(51, 51, 51, 1);
-					vertical-align: bottom;
 				}
 				span {
 					font-size: 30px;

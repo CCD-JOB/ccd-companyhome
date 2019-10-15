@@ -24,11 +24,13 @@
           el-dropdown-menu.risk-info-dropdown(slot="dropdown")
             el-dropdown-item(v-for="item in dropdownList" :key="item.id")
               div(@click="handleChoseFilter(item)") {{item.name}}
+      p.noRiskInfo(v-if="noRiskInfo") 暂无风险信息
       scroll-com(
         ref="scrollCom"
         pullup
         :data="list"
         @scrollToEnd="handleLoadMore"
+        v-if="!noRiskInfo"
       )
         component(
           :is="currentTabComponent[current]"
@@ -180,12 +182,13 @@ export default {
       listNavList: [],
       list: [],
       listInfo: {},
-      dropdownList: []
+      dropdownList: [],
+      noRiskInfo: false
     }
   },
   created () {
     this.queryParam.companyId = this.$route.query.id
-    this.queryParam.companyId = 26677
+    // this.queryParam.companyId = 26677
     this.getDataInfo()
   },
   methods: {
@@ -195,11 +198,20 @@ export default {
     },
     async getDataInfo () {
       try {
+        let riskTotal = 0
         let result = await this.$api.companyinfo
           .getShowVentureCount({ companyId: this.queryParam.companyId })
           .then(res => {
             return JSON.parse(res)
           })
+        for (let key in result.data) {
+          riskTotal += result.data[key]
+        }
+        if (riskTotal === 0) {
+          this.noRiskInfo = true
+          return
+        }
+
         this.siderMenuList.map(item => {
           for (const key in result.data) {
             if (result.data.hasOwnProperty(key) && item.id === key) {
@@ -337,6 +349,7 @@ export default {
 		}
 		.risk-info-content {
 			padding: 0;
+			position: relative;
 			.risk-info-title {
 				padding: 10px 35px;
 				background: #f8f8f8;
@@ -371,6 +384,16 @@ export default {
 						margin-left: 16px;
 					}
 				}
+			}
+			.noRiskInfo {
+				font-size: 32px;
+				line-height: 50px;
+				color: #666;
+				font-weight: 500;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
 			}
 		}
 	}

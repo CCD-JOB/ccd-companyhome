@@ -3,7 +3,7 @@
   .scroll-content
     div(ref="listWrapper")
       slot
-    slot(name="pullup" :pullUpLoadObj="pullUpLoadObj")
+    slot(name="pullup" :pullUpLoadObj="pullUpLoadObj" v-if="isTip")
       .pullup-wrapper(v-if="pullup")
         .before-trigger(v-if="!isPullUpLoad")
           span {{pullUpTxt}}
@@ -65,6 +65,10 @@ export default {
     refreshDelay: {
       type: Number,
       default: 20
+    },
+    isTip: {
+      type: Boolean,
+      default: true
     }
   },
   mounted () {

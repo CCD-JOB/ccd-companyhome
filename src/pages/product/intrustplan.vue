@@ -19,9 +19,6 @@
       .top-part-btns
         el-button(type="primary") {{productInfo.type}}
     .main-part
-      .main-part-info(@click="isHomeAlertGoDialogVisible = true") 风险提示
-        span 未按要求进行产品更新或着其他原因呵呵呵呵呵
-        i.iconfont &#xe64d;
       .main-part-slide
         .swiper-container
           .swiper-wrapper
@@ -78,7 +75,7 @@
             i.iconfont &#xe609;
             span 付息方式： {{productInfo.paymentMethod}}
           p
-            i.iconfont &#xe652;
+            i.iconfont &#xe859;
             span.spec 费用标准：
               em 托管费/年 {{productInfo.hostingFee}}
             span.spec
@@ -150,14 +147,21 @@ export default {
     this.probeType = 3
     this.listenScroll = true
     this.id = this.$route.query.id
-    this.getWarningListPart()
-    this.getBasicInfo()
+    this.productId = this.$route.query.productid
+    // this.id = 1547451658666
+    // this.productId = 1547452014555
+    this._initialGetInfo()
   },
   methods: {
+    _initialGetInfo () {
+      this.getWarningListPart()
+      this.getBasicInfo()
+    },
+    // 获取基本信息
     async getBasicInfo () {
       try {
         let param = {
-          productId: 1547452014555,
+          productId: this.productId,
           type: 2
         }
         let result = await this.$api.product.getProductBasicInfo(param)
@@ -256,7 +260,7 @@ export default {
         this.$refs.titleFixed.style.top = 0
       }
       if (-newY < 1600) {
-        this.$refs.titleFixed.style.top = '-300px'
+        this.$refs.titleFixed.style.top = '-350px'
       }
     }
   }
@@ -290,7 +294,7 @@ export default {
 	.main-part-warning-info-fixed-title {
 		width: 100%;
 		position: absolute;
-		top: -300px;
+		top: -350px;
 		left: 0;
 		transition: 1s;
 		padding: 30px 36px;
@@ -385,7 +389,7 @@ export default {
 			}
 		}
 		.main-part-slide {
-			padding: 20px 36px;
+			padding: 50px 36px 20px;
 			.swiper-wrapper {
 				margin: 0 36px 10px;
 				.swiper-slide {
